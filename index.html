@@ -16,7 +16,7 @@
     }
 
     .container {
-      max-width: 1150px;
+      max-width: 1200px;
       margin: 0 auto;
       background: #ffffff;
       border-radius: 14px;
@@ -37,9 +37,9 @@
       gap: 24px;
     }
 
-    @media (min-width: 950px) {
+    @media (min-width: 980px) {
       .grid {
-        grid-template-columns: 1.1fr 0.9fr;
+        grid-template-columns: 1.05fr 0.95fr;
       }
     }
 
@@ -105,7 +105,8 @@
     #authStatus,
     #adminStatus,
     #passwordStatus,
-    #recoveryStatus {
+    #recoveryStatus,
+    #sortStatus {
       margin: 14px 0;
       padding: 12px 14px;
       border-radius: 10px;
@@ -128,7 +129,8 @@
     }
 
     #passwordStatus,
-    #recoveryStatus {
+    #recoveryStatus,
+    #sortStatus {
       background: #f5f3ff;
       border: 1px solid #ddd6fe;
     }
@@ -180,7 +182,8 @@
 
     .admin-box,
     .password-box,
-    .recovery-box {
+    .recovery-box,
+    .sort-box {
       margin-top: 16px;
       padding: 14px;
       border-radius: 12px;
@@ -201,10 +204,74 @@
       border: 1px solid #d8b4fe;
     }
 
-    .divider {
-      height: 1px;
-      background: #e5e7eb;
-      margin: 18px 0;
+    .sort-box {
+      background: #fffaf0;
+      border: 1px solid #fde68a;
+    }
+
+    .sortable-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .sortable-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      touch-action: none;
+    }
+
+    .drag-handle {
+      width: 42px;
+      min-width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f3f4f6;
+      color: #374151;
+      cursor: grab;
+      font-size: 20px;
+      user-select: none;
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    .sortable-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sortable-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .sortable-subtitle {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #ecfeff;
+      color: #0f766e;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .ghost {
+      opacity: 0.4;
     }
   </style>
 </head>
@@ -270,12 +337,6 @@
           <label for="categoryName">Nome categoria</label>
           <input type="text" id="categoryName" placeholder="Es. Primi piatti" />
 
-          <label for="categorySlug">Slug</label>
-          <input type="text" id="categorySlug" placeholder="Es. primi-piatti" />
-
-          <label for="categoryOrder">Ordine</label>
-          <input type="number" id="categoryOrder" placeholder="Es. 6" />
-
           <label for="categoryVisible">Visibile</label>
           <select id="categoryVisible">
             <option value="true">Sì</option>
@@ -285,10 +346,25 @@
           <button id="saveCategoryBtn">Salva categoria</button>
           <div id="adminStatus">Stato admin: pronto</div>
         </div>
+
+        <div id="sortBox" class="sort-box hidden">
+          <h3>Ordina categorie</h3>
+          <p class="small">Tieni premuta la maniglia e trascina. Funziona anche su touch screen.</p>
+
+          <div id="sortableCategories" class="sortable-list"></div>
+
+          <div class="button-row">
+            <button id="saveSortBtn">Salva nuovo ordine</button>
+            <button id="reloadSortBtn" class="secondary-btn">Ricarica elenco</button>
+          </div>
+
+          <div id="sortStatus">Stato ordinamento: pronto</div>
+        </div>
       </section>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
@@ -320,58 +396,118 @@
     const adminBoxEl = document.getElementById('adminBox')
     const adminStatusEl = document.getElementById('adminStatus')
     const categoryNameEl = document.getElementById('categoryName')
-    const categorySlugEl = document.getElementById('categorySlug')
-    const categoryOrderEl = document.getElementById('categoryOrder')
     const categoryVisibleEl = document.getElementById('categoryVisible')
     const saveCategoryBtn = document.getElementById('saveCategoryBtn')
 
+    const sortBoxEl = document.getElementById('sortBox')
+    const sortableCategoriesEl = document.getElementById('sortableCategories')
+    const saveSortBtn = document.getElementById('saveSortBtn')
+    const reloadSortBtn = document.getElementById('reloadSortBtn')
+    const sortStatusEl = document.getElementById('sortStatus')
+
+    let sortableInstance = null
+    let cachedCategories = []
+
     function slugify(text) {
       return text
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
         .trim()
+        .replace(/&/g, ' e ')
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9\-]/g, '')
         .replace(/\-+/g, '-')
+        .replace(/^-+|-+$/g, '')
     }
 
-    categoryNameEl.addEventListener('input', () => {
-      if (!categorySlugEl.value.trim()) {
-        categorySlugEl.value = slugify(categoryNameEl.value)
-      }
-    })
+    async function fetchCategories() {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('id, name, slug, visible, sort_order')
+        .order('sort_order', { ascending: true })
+
+      if (error) throw error
+      return data || []
+    }
 
     async function loadCategories() {
       statusEl.className = ''
       statusEl.textContent = 'Stato: caricamento categorie...'
       categoriesEl.innerHTML = ''
 
-      const { data, error } = await supabase
-        .from('categories')
-        .select('id, name, slug, visible, sort_order')
-        .order('sort_order', { ascending: true })
+      try {
+        const data = await fetchCategories()
+        cachedCategories = data
 
-      if (error) {
+        statusEl.className = 'success'
+        statusEl.textContent = 'Categorie caricate: ' + data.length
+
+        if (!data.length) {
+          categoriesEl.innerHTML = '<div class="empty">Nessuna categoria presente nel database.</div>'
+          return
+        }
+
+        categoriesEl.innerHTML = data.map(category => `
+          <div class="category-card">
+            <div class="category-name">${category.name}</div>
+            <div class="category-meta">Slug: ${category.slug}</div>
+            <div class="category-meta">Visibile: ${category.visible ? 'Sì' : 'No'}</div>
+            <div class="category-meta">Ordine: ${category.sort_order}</div>
+          </div>
+        `).join('')
+      } catch (error) {
         statusEl.className = 'error'
         statusEl.textContent = 'Errore: ' + error.message
+      }
+    }
+
+    function renderSortableCategories() {
+      sortableCategoriesEl.innerHTML = ''
+
+      if (!cachedCategories.length) {
+        sortableCategoriesEl.innerHTML = '<div class="empty">Nessuna categoria da ordinare.</div>'
         return
       }
 
-      statusEl.className = 'success'
-      statusEl.textContent = 'Categorie caricate: ' + data.length
-
-      if (!data || data.length === 0) {
-        categoriesEl.innerHTML = '<div class="empty">Nessuna categoria presente nel database.</div>'
-        return
-      }
-
-      categoriesEl.innerHTML = data.map(category => `
-        <div class="category-card">
-          <div class="category-name">${category.name}</div>
-          <div class="category-meta">Slug: ${category.slug}</div>
-          <div class="category-meta">Visibile: ${category.visible ? 'Sì' : 'No'}</div>
-          <div class="category-meta">Ordine: ${category.sort_order}</div>
+      sortableCategoriesEl.innerHTML = cachedCategories.map(category => `
+        <div class="sortable-item" data-id="${category.id}">
+          <div class="drag-handle">☰</div>
+          <div class="sortable-content">
+            <div class="sortable-title">${category.name}</div>
+            <div class="sortable-subtitle">Slug: ${category.slug}</div>
+            <div class="tag">${category.visible ? 'Visibile' : 'Nascosta'}</div>
+          </div>
         </div>
       `).join('')
+
+      if (sortableInstance) {
+        sortableInstance.destroy()
+      }
+
+      sortableInstance = Sortable.create(sortableCategoriesEl, {
+        animation: 150,
+        handle: '.drag-handle',
+        ghostClass: 'ghost',
+        delay: 120,
+        delayOnTouchOnly: true,
+        touchStartThreshold: 4
+      })
+    }
+
+    async function refreshSortableList() {
+      sortStatusEl.className = ''
+      sortStatusEl.textContent = 'Stato ordinamento: caricamento elenco...'
+
+      try {
+        cachedCategories = await fetchCategories()
+        renderSortableCategories()
+        sortStatusEl.className = 'success'
+        sortStatusEl.textContent = 'Elenco ordinabile aggiornato.'
+      } catch (error) {
+        sortStatusEl.className = 'error'
+        sortStatusEl.textContent = 'Errore ordinamento: ' + error.message
+      }
     }
 
     async function updateAuthState() {
@@ -383,11 +519,14 @@
         authStatusEl.textContent = 'Stato login: autenticato come ' + session.user.email
         adminBoxEl.classList.remove('hidden')
         changePasswordBoxEl.classList.remove('hidden')
+        sortBoxEl.classList.remove('hidden')
+        await refreshSortableList()
       } else {
         authStatusEl.className = ''
         authStatusEl.textContent = 'Stato login: non autenticato'
         adminBoxEl.classList.add('hidden')
         changePasswordBoxEl.classList.add('hidden')
+        sortBoxEl.classList.add('hidden')
       }
     }
 
@@ -404,10 +543,7 @@
       authStatusEl.className = ''
       authStatusEl.textContent = 'Accesso in corso...'
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
 
       if (error) {
         authStatusEl.className = 'error'
@@ -461,9 +597,9 @@
         return
       }
 
-      if (newPassword.length < 6) {
+      if (newPassword.length < 8) {
         passwordStatusEl.className = 'error'
-        passwordStatusEl.textContent = 'Usa una password di almeno 6 caratteri.'
+        passwordStatusEl.textContent = 'Usa una password di almeno 8 caratteri.'
         return
       }
 
@@ -489,9 +625,11 @@
 
     async function saveCategory() {
       const name = categoryNameEl.value.trim()
-      const slug = categorySlugEl.value.trim() || slugify(name)
-      const sort_order = Number(categoryOrderEl.value || 0)
+      const slug = slugify(name)
       const visible = categoryVisibleEl.value === 'true'
+      const nextSortOrder = cachedCategories.length
+        ? Math.max(...cachedCategories.map(c => c.sort_order || 0)) + 1
+        : 1
 
       if (!name) {
         adminStatusEl.className = 'error'
@@ -501,7 +639,7 @@
 
       if (!slug) {
         adminStatusEl.className = 'error'
-        adminStatusEl.textContent = 'Inserisci uno slug valido.'
+        adminStatusEl.textContent = 'Nome categoria non valido per generare lo slug.'
         return
       }
 
@@ -513,7 +651,7 @@
         .insert({
           name,
           slug,
-          sort_order,
+          sort_order: nextSortOrder,
           visible
         })
 
@@ -527,11 +665,46 @@
       adminStatusEl.textContent = 'Categoria salvata con successo.'
 
       categoryNameEl.value = ''
-      categorySlugEl.value = ''
-      categoryOrderEl.value = ''
       categoryVisibleEl.value = 'true'
 
       await loadCategories()
+      await refreshSortableList()
+    }
+
+    async function saveCategoryOrder() {
+      const items = [...sortableCategoriesEl.querySelectorAll('.sortable-item')]
+
+      if (!items.length) {
+        sortStatusEl.className = 'error'
+        sortStatusEl.textContent = 'Nessuna categoria da ordinare.'
+        return
+      }
+
+      sortStatusEl.className = ''
+      sortStatusEl.textContent = 'Salvataggio nuovo ordine in corso...'
+
+      try {
+        for (let i = 0; i < items.length; i++) {
+          const id = items[i].dataset.id
+          const newOrder = i + 1
+
+          const { error } = await supabase
+            .from('categories')
+            .update({ sort_order: newOrder })
+            .eq('id', id)
+
+          if (error) throw error
+        }
+
+        sortStatusEl.className = 'success'
+        sortStatusEl.textContent = 'Nuovo ordine salvato con successo.'
+
+        await loadCategories()
+        await refreshSortableList()
+      } catch (error) {
+        sortStatusEl.className = 'error'
+        sortStatusEl.textContent = 'Errore salvataggio ordine: ' + error.message
+      }
     }
 
     async function logout() {
@@ -553,9 +726,11 @@
     sendRecoveryBtn.addEventListener('click', sendRecovery)
     savePasswordBtn.addEventListener('click', saveNewPassword)
     saveCategoryBtn.addEventListener('click', saveCategory)
+    saveSortBtn.addEventListener('click', saveCategoryOrder)
+    reloadSortBtn.addEventListener('click', refreshSortableList)
 
-    updateAuthState()
     loadCategories()
+    updateAuthState()
   </script>
 </body>
 </html>
