@@ -120,19 +120,6 @@
       }
     }
 
-    .skip-link {
-      position: absolute;
-      left: var(--space-4);
-      top: -40px;
-      padding: var(--space-2) var(--space-3);
-      background: var(--color-primary);
-      color: var(--color-text-inverse);
-      border-radius: var(--radius-sm);
-      text-decoration: none;
-      z-index: 2000;
-    }
-    .skip-link:focus { top: var(--space-4); }
-
     .shell {
       max-width: var(--content-wide);
       margin: 0 auto;
@@ -599,8 +586,6 @@
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#mainContent">Vai al contenuto</a>
-
   <div class="shell">
     <header class="topbar">
       <div class="brand" aria-label="Menu Millennium">
@@ -908,44 +893,20 @@
       return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/&/g, ' e ').replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '').replace(/\-+/g, '-').replace(/^-+|-+$/g, '')
     }
 
-    function formatPrice(value) {
-      return Number(value).toFixed(2).replace('.', ',') + ' €'
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;')
-    }
+    function formatPrice(value) { return Number(value).toFixed(2).replace('.', ',') + ' €' }
+    function escapeHtml(value) { return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;') }
 
     function renderAllergenCheckboxes() {
-      allergenCheckboxesEl.innerHTML = ALLERGENS.map(allergen => `
-        <div class="checkbox-item">
-          <input type="checkbox" id="allergen-${allergen.id}" value="${allergen.id}" />
-          <label for="allergen-${allergen.id}" style="margin:0;">${allergen.id}. ${escapeHtml(allergen.label)}</label>
-        </div>
-      `).join('')
+      allergenCheckboxesEl.innerHTML = ALLERGENS.map(allergen => `<div class="checkbox-item"><input type="checkbox" id="allergen-${allergen.id}" value="${allergen.id}" /><label for="allergen-${allergen.id}" style="margin:0;">${allergen.id}. ${escapeHtml(allergen.label)}</label></div>`).join('')
     }
 
     function renderLegend() {
-      legendGridEl.innerHTML = `
-        <div class="legend-item"><strong>*</strong> Prodotto surgelato</div>
-        ${ALLERGENS.map(allergen => `<div class="legend-item"><strong>${allergen.id}</strong>. ${escapeHtml(allergen.label)}</div>`).join('')}
-      `
+      legendGridEl.innerHTML = `<div class="legend-item"><strong>*</strong> Prodotto surgelato</div>${ALLERGENS.map(allergen => `<div class="legend-item"><strong>${allergen.id}</strong>. ${escapeHtml(allergen.label)}</div>`).join('')}`
     }
 
-    function getSelectedAllergens() {
-      return [...allergenCheckboxesEl.querySelectorAll('input[type="checkbox"]:checked')].map(cb => Number(cb.value)).sort((a, b) => a - b)
-    }
-
-    function setSelectedAllergens(allergens = []) {
-      allergenCheckboxesEl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-        cb.checked = allergens.includes(Number(cb.value))
-      })
-    }
-
-    function formatAllergenSup(allergens = []) {
-      if (!allergens.length) return ''
-      return `<sup>${allergens.join(',')}</sup>`
-    }
+    function getSelectedAllergens() { return [...allergenCheckboxesEl.querySelectorAll('input[type="checkbox"]:checked')].map(cb => Number(cb.value)).sort((a, b) => a - b) }
+    function setSelectedAllergens(allergens = []) { allergenCheckboxesEl.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = allergens.includes(Number(cb.value))) }
+    function formatAllergenSup(allergens = []) { return allergens.length ? `<sup>${allergens.join(',')}</sup>` : '' }
 
     function resetCategoryForm() {
       editingCategoryId = null
@@ -1022,8 +983,7 @@
       const category = cachedFullMenu.find(c => c.id === categoryId) || cachedCategories.find(c => c.id === categoryId)
       if (!category) return
       const itemsCount = (category.menu_items || []).length
-      const message = 'Stai per eliminare la categoria "' + category.name + '".\n\nATTENZIONE: verranno eliminati anche tutti i piatti collegati a questa categoria.\nPiatti collegati trovati: ' + itemsCount + '.\n\nVuoi continuare?'
-      if (!window.confirm(message)) return
+      if (!window.confirm('Stai per eliminare la categoria "' + category.name + '".\n\nATTENZIONE: verranno eliminati anche tutti i piatti collegati a questa categoria.\nPiatti collegati trovati: ' + itemsCount + '.\n\nVuoi continuare?')) return
       adminStatusEl.className = ''
       adminStatusEl.textContent = 'Eliminazione categoria in corso...'
       const { error } = await supabase.from('categories').delete().eq('id', categoryId)
@@ -1064,24 +1024,7 @@
     }
 
     async function fetchFullMenu() {
-      const { data, error } = await supabase.from('categories').select(`
-          id,
-          name,
-          slug,
-          visible,
-          sort_order,
-          menu_items (
-            id,
-            category_id,
-            name,
-            description,
-            price,
-            visible,
-            sort_order,
-            allergens,
-            is_frozen
-          )
-        `).order('sort_order', { ascending: true })
+      const { data, error } = await supabase.from('categories').select(`id,name,slug,visible,sort_order,menu_items (id,category_id,name,description,price,visible,sort_order,allergens,is_frozen)`).order('sort_order', { ascending: true })
       if (error) throw error
       return (data || []).map(category => ({ ...category, menu_items: (category.menu_items || []).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)) }))
     }
@@ -1103,14 +1046,7 @@
         stickyCategoriesEl.innerHTML = ''
         return
       }
-      stickyCategoriesEl.innerHTML = `
-        <div class="menu-sticky-nav">
-          <div class="menu-sticky-nav-label">Vai alla categoria</div>
-          <div class="menu-sticky-links">
-            ${visibleCategories.map(category => `<a class="menu-sticky-link" href="#category-${category.id}">${escapeHtml(category.name)}</a>`).join('')}
-          </div>
-        </div>
-      `
+      stickyCategoriesEl.innerHTML = `<div class="menu-sticky-nav"><div class="menu-sticky-nav-label">Vai alla categoria</div><div class="menu-sticky-links">${visibleCategories.map(category => `<a class="menu-sticky-link" href="#category-${category.id}">${escapeHtml(category.name)}</a>`).join('')}</div></div>`
     }
 
     function renderPublicMenu() {
@@ -1123,28 +1059,7 @@
       renderStickyCategories()
       publicMenuEl.innerHTML = visibleCategories.map(category => {
         const visibleItems = (category.menu_items || []).filter(item => item.visible)
-        return `
-          <article class="menu-category" id="category-${category.id}">
-            <div class="menu-category-header">
-              <div class="menu-category-title">${escapeHtml(category.name)}</div>
-              <div class="menu-category-slug">${escapeHtml(category.slug)}</div>
-            </div>
-            <div class="menu-items">
-              ${visibleItems.length ? visibleItems.map(item => `
-                <div class="menu-item">
-                  <div class="menu-item-top">
-                    <div style="flex:1">
-                      <div class="menu-item-name">${escapeHtml(item.name)}${item.is_frozen ? '*' : ''}${formatAllergenSup(Array.isArray(item.allergens) ? item.allergens : [])}</div>
-                      ${item.description ? `<div class="menu-item-description">${escapeHtml(item.description)}</div>` : ''}
-                      <div class="menu-item-meta">Ordine: ${item.sort_order ?? '-'}</div>
-                    </div>
-                    <div class="menu-item-price">${formatPrice(item.price)}</div>
-                  </div>
-                </div>
-              `).join('') : '<div class="empty">Nessun piatto visibile in questa categoria.</div>'}
-            </div>
-          </article>
-        `
+        return `<article class="menu-category" id="category-${category.id}"><div class="menu-category-header"><div class="menu-category-title">${escapeHtml(category.name)}</div><div class="menu-category-slug">${escapeHtml(category.slug)}</div></div><div class="menu-items">${visibleItems.length ? visibleItems.map(item => `<div class="menu-item"><div class="menu-item-top"><div style="flex:1"><div class="menu-item-name">${escapeHtml(item.name)}${item.is_frozen ? '*' : ''}${formatAllergenSup(Array.isArray(item.allergens) ? item.allergens : [])}</div>${item.description ? `<div class="menu-item-description">${escapeHtml(item.description)}</div>` : ''}<div class="menu-item-meta">Ordine: ${item.sort_order ?? '-'}</div></div><div class="menu-item-price">${formatPrice(item.price)}</div></div></div>`).join('') : '<div class="empty">Nessun piatto visibile in questa categoria.</div>'}</div></article>`
       }).join('')
     }
 
@@ -1154,16 +1069,7 @@
         sortableCategoriesEl.innerHTML = '<div class="empty">Nessuna categoria da ordinare.</div>'
         return
       }
-      sortableCategoriesEl.innerHTML = cachedCategories.map(category => `
-        <div class="sortable-item" data-id="${category.id}">
-          <div class="drag-handle">☰</div>
-          <div class="sortable-content">
-            <div class="sortable-title">${escapeHtml(category.name)}</div>
-            <div class="sortable-subtitle">Slug: ${escapeHtml(category.slug)}</div>
-            <div class="tag">${category.visible ? 'Visibile' : 'Nascosta'}</div>
-          </div>
-        </div>
-      `).join('')
+      sortableCategoriesEl.innerHTML = cachedCategories.map(category => `<div class="sortable-item" data-id="${category.id}"><div class="drag-handle">☰</div><div class="sortable-content"><div class="sortable-title">${escapeHtml(category.name)}</div><div class="sortable-subtitle">Slug: ${escapeHtml(category.slug)}</div><div class="tag">${category.visible ? 'Visibile' : 'Nascosta'}</div></div></div>`).join('')
       if (sortableCategoriesInstance) sortableCategoriesInstance.destroy()
       sortableCategoriesInstance = Sortable.create(sortableCategoriesEl, { animation: 150, handle: '.drag-handle', ghostClass: 'ghost', delay: 120, delayOnTouchOnly: true, touchStartThreshold: 4 })
     }
@@ -1180,16 +1086,7 @@
         sortableItemsEl.innerHTML = '<div class="empty">Nessun piatto in questa categoria.</div>'
         return
       }
-      sortableItemsEl.innerHTML = items.map(item => `
-        <div class="sortable-item" data-id="${item.id}">
-          <div class="drag-handle">☰</div>
-          <div class="sortable-content">
-            <div class="sortable-title">${escapeHtml(item.name)}${item.is_frozen ? '*' : ''}</div>
-            <div class="sortable-subtitle">${escapeHtml(item.description || 'Nessuna descrizione')}</div>
-            <div class="tag">${item.visible ? 'Visibile' : 'Nascosto'} · Prezzo ${formatPrice(item.price)}</div>
-          </div>
-        </div>
-      `).join('')
+      sortableItemsEl.innerHTML = items.map(item => `<div class="sortable-item" data-id="${item.id}"><div class="drag-handle">☰</div><div class="sortable-content"><div class="sortable-title">${escapeHtml(item.name)}${item.is_frozen ? '*' : ''}</div><div class="sortable-subtitle">${escapeHtml(item.description || 'Nessuna descrizione')}</div><div class="tag">${item.visible ? 'Visibile' : 'Nascosto'} · Prezzo ${formatPrice(item.price)}</div></div></div>`).join('')
       if (sortableItemsInstance) sortableItemsInstance.destroy()
       sortableItemsInstance = Sortable.create(sortableItemsEl, { animation: 150, handle: '.drag-handle', ghostClass: 'ghost', delay: 120, delayOnTouchOnly: true, touchStartThreshold: 4 })
     }
@@ -1203,26 +1100,7 @@
         staffCategoriesManagerEl.innerHTML = '<div class="empty">Nessun contenuto disponibile.</div>'
         return
       }
-      staffCategoriesManagerEl.innerHTML = cachedFullMenu.map(category => `
-        <div class="category-block">
-          <div class="staff-card">
-            <div class="staff-item-row"><div><strong>${escapeHtml(category.name)}</strong><div class="small">Slug: ${escapeHtml(category.slug)} · ${category.visible ? 'Visibile' : 'Nascosta'}</div></div></div>
-            <div class="staff-actions">
-              <button type="button" class="mini-btn secondary-btn staff-edit-category-btn" data-category-id="${category.id}">Modifica categoria</button>
-              <button type="button" class="mini-btn danger-btn staff-delete-category-btn" data-category-id="${category.id}">Elimina categoria</button>
-            </div>
-          </div>
-          ${(category.menu_items || []).length ? category.menu_items.map(item => `
-            <div class="staff-card">
-              <div class="staff-item-row"><div><strong>${escapeHtml(item.name)}${item.is_frozen ? '*' : ''}</strong><div class="small">${escapeHtml(item.description || 'Nessuna descrizione')}</div><div class="small">Prezzo: ${formatPrice(item.price)} · ${item.visible ? 'Visibile' : 'Nascosto'} · Ordine: ${item.sort_order ?? '-'}</div></div></div>
-              <div class="staff-actions">
-                <button type="button" class="mini-btn secondary-btn staff-edit-item-btn" data-item-id="${item.id}">Modifica piatto</button>
-                <button type="button" class="mini-btn danger-btn staff-delete-item-btn" data-item-id="${item.id}">Elimina piatto</button>
-              </div>
-            </div>
-          `).join('') : '<div class="empty">Nessun piatto in questa categoria.</div>'}
-        </div>
-      `).join('')
+      staffCategoriesManagerEl.innerHTML = cachedFullMenu.map(category => `<div class="category-block"><div class="staff-card"><div class="staff-item-row"><div><strong>${escapeHtml(category.name)}</strong><div class="small">Slug: ${escapeHtml(category.slug)} · ${category.visible ? 'Visibile' : 'Nascosta'}</div></div></div><div class="staff-actions"><button type="button" class="mini-btn secondary-btn staff-edit-category-btn" data-category-id="${category.id}">Modifica categoria</button><button type="button" class="mini-btn danger-btn staff-delete-category-btn" data-category-id="${category.id}">Elimina categoria</button></div></div>${(category.menu_items || []).length ? category.menu_items.map(item => `<div class="staff-card"><div class="staff-item-row"><div><strong>${escapeHtml(item.name)}${item.is_frozen ? '*' : ''}</strong><div class="small">${escapeHtml(item.description || 'Nessuna descrizione')}</div><div class="small">Prezzo: ${formatPrice(item.price)} · ${item.visible ? 'Visibile' : 'Nascosto'} · Ordine: ${item.sort_order ?? '-'}</div></div></div><div class="staff-actions"><button type="button" class="mini-btn secondary-btn staff-edit-item-btn" data-item-id="${item.id}">Modifica piatto</button><button type="button" class="mini-btn danger-btn staff-delete-item-btn" data-item-id="${item.id}">Elimina piatto</button></div></div>`).join('') : '<div class="empty">Nessun piatto in questa categoria.</div>'}</div>`).join('')
       document.querySelectorAll('.staff-edit-category-btn').forEach(btn => btn.addEventListener('click', () => startCategoryEdit(btn.dataset.categoryId)))
       document.querySelectorAll('.staff-delete-category-btn').forEach(btn => btn.addEventListener('click', () => deleteCategory(btn.dataset.categoryId)))
       document.querySelectorAll('.staff-edit-item-btn').forEach(btn => btn.addEventListener('click', () => startItemEdit(btn.dataset.itemId)))
@@ -1237,9 +1115,8 @@
         renderPublicMenu()
         renderSortableItems()
         renderStaffManager()
-        const visibleCount = cachedFullMenu.filter(category => category.visible).length
         statusEl.className = 'success'
-        statusEl.textContent = 'Categorie caricate: ' + visibleCount
+        statusEl.textContent = 'Categorie caricate: ' + cachedFullMenu.filter(category => category.visible).length
       } catch (error) {
         statusEl.className = 'error'
         statusEl.textContent = 'Errore: ' + error.message
@@ -1262,10 +1139,7 @@
       }
     }
 
-    async function refreshAllData() {
-      await refreshStaffData()
-      await loadPublicMenu()
-    }
+    async function refreshAllData() { await refreshStaffData(); await loadPublicMenu() }
 
     async function updateAuthState() {
       const { data } = await supabase.auth.getSession()
@@ -1527,10 +1401,7 @@
 
     function subscribeRealtime() {
       if (realtimeChannel) supabase.removeChannel(realtimeChannel)
-      realtimeChannel = supabase.channel('menu-realtime')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, async () => { await refreshAllData() })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, async () => { await refreshAllData() })
-        .subscribe()
+      realtimeChannel = supabase.channel('menu-realtime').on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, async () => { await refreshAllData() }).on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, async () => { await refreshAllData() }).subscribe()
     }
 
     loadMenuBtn.addEventListener('click', loadPublicMenu)
@@ -1551,10 +1422,7 @@
     closeStaffDrawerBtnEl.addEventListener('click', closeStaffDrawer)
     staffOverlayEl.addEventListener('click', closeStaffDrawer)
     themeToggleEl.addEventListener('click', () => applyTheme(currentTheme === 'dark' ? 'light' : 'dark'))
-
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape') closeStaffDrawer()
-    })
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') closeStaffDrawer() })
 
     renderAllergenCheckboxes()
     renderLegend()
