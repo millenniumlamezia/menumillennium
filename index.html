@@ -309,6 +309,13 @@
       margin-bottom: 4px;
     }
 
+    .menu-item-name sup {
+      font-size: 11px;
+      font-weight: normal;
+      color: #666;
+      margin-left: 2px;
+    }
+
     .menu-item-description {
       color: #666;
       font-size: 14px;
@@ -327,6 +334,49 @@
       margin-top: 8px;
       color: #888;
       font-size: 12px;
+    }
+
+    .legend-box {
+      margin-top: 24px;
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      background: #fffef8;
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px 18px;
+      margin-top: 12px;
+    }
+
+    .legend-item {
+      font-size: 14px;
+      color: #444;
+    }
+
+    .allergen-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px 14px;
+      margin: 8px 0 14px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      transform: scale(1.15);
     }
 
     .sortable-list {
@@ -411,6 +461,12 @@
 
         <div id="status">Stato: pronto</div>
         <div id="publicMenu"></div>
+
+        <div class="legend-box">
+          <h3>Legenda</h3>
+          <p class="small">L’asterisco indica prodotto surgelato. I numeri in piccolo indicano gli allergeni presenti nel piatto. [web:427][web:429]</p>
+          <div class="legend-grid" id="legendGrid"></div>
+        </div>
       </section>
 
       <section class="panel">
@@ -487,6 +543,14 @@
           <label for="itemPrice">Prezzo</label>
           <input type="number" id="itemPrice" step="0.01" min="0" placeholder="Es. 7.50" />
 
+          <label>Allergeni</label>
+          <div class="allergen-grid" id="allergenCheckboxes"></div>
+
+          <div class="checkbox-item" style="margin-bottom: 14px;">
+            <input type="checkbox" id="itemFrozen" />
+            <label for="itemFrozen" style="margin:0; font-weight:bold;">Prodotto surgelato</label>
+          </div>
+
           <label for="itemVisible">Visibile</label>
           <select id="itemVisible">
             <option value="true">Sì</option>
@@ -526,11 +590,29 @@
     const SUPABASE_KEY = 'sb_publishable_fwhO7nTMTiUJd991F1e6tw_xR99S7Ln'
     const REDIRECT_TO = 'https://millenniumlamezia.github.io/menumillennium/#reset-password'
 
+    const ALLERGENS = [
+      { id: 1, label: 'Cereali contenenti glutine' },
+      { id: 2, label: 'Crostacei' },
+      { id: 3, label: 'Uova' },
+      { id: 4, label: 'Pesce' },
+      { id: 5, label: 'Arachidi' },
+      { id: 6, label: 'Soia' },
+      { id: 7, label: 'Latte' },
+      { id: 8, label: 'Frutta a guscio' },
+      { id: 9, label: 'Sedano' },
+      { id: 10, label: 'Senape' },
+      { id: 11, label: 'Semi di sesamo' },
+      { id: 12, label: 'Anidride solforosa e solfiti' },
+      { id: 13, label: 'Lupini' },
+      { id: 14, label: 'Molluschi' }
+    ]
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
     const statusEl = document.getElementById('status')
     const publicMenuEl = document.getElementById('publicMenu')
     const loadMenuBtn = document.getElementById('loadMenuBtn')
+    const legendGridEl = document.getElementById('legendGrid')
 
     const emailEl = document.getElementById('email')
     const passwordEl = document.getElementById('password')
@@ -563,6 +645,8 @@
     const itemDescriptionEl = document.getElementById('itemDescription')
     const itemPriceEl = document.getElementById('itemPrice')
     const itemVisibleEl = document.getElementById('itemVisible')
+    const itemFrozenEl = document.getElementById('itemFrozen')
+    const allergenCheckboxesEl = document.getElementById('allergenCheckboxes')
     const saveItemBtn = document.getElementById('saveItemBtn')
     const cancelItemEditBtn = document.getElementById('cancelItemEditBtn')
     const itemFormTitleEl = document.getElementById('itemFormTitle')
@@ -607,6 +691,41 @@
         .replace(/'/g, '&#039;')
     }
 
+    function renderAllergenCheckboxes() {
+      allergenCheckboxesEl.innerHTML = ALLERGENS.map(allergen => `
+        <div class="checkbox-item">
+          <input type="checkbox" id="allergen-${allergen.id}" value="${allergen.id}" />
+          <label for="allergen-${allergen.id}" style="margin:0;">${allergen.id}. ${escapeHtml(allergen.label)}</label>
+        </div>
+      `).join('')
+    }
+
+    function renderLegend() {
+      legendGridEl.innerHTML = `
+        <div class="legend-item"><strong>*</strong> Prodotto surgelato</div>
+        ${ALLERGENS.map(allergen => `
+          <div class="legend-item"><strong>${allergen.id}</strong>. ${escapeHtml(allergen.label)}</div>
+        `).join('')}
+      `
+    }
+
+    function getSelectedAllergens() {
+      return [...allergenCheckboxesEl.querySelectorAll('input[type="checkbox"]:checked')]
+        .map(cb => Number(cb.value))
+        .sort((a, b) => a - b)
+    }
+
+    function setSelectedAllergens(allergens = []) {
+      allergenCheckboxesEl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = allergens.includes(Number(cb.value))
+      })
+    }
+
+    function formatAllergenSup(allergens = []) {
+      if (!allergens.length) return ''
+      return `<sup>${allergens.join(',')}</sup>`
+    }
+
     function resetCategoryForm() {
       editingCategoryId = null
       categoryFormTitleEl.textContent = 'Nuova categoria'
@@ -632,6 +751,8 @@
       itemDescriptionEl.value = ''
       itemPriceEl.value = ''
       itemVisibleEl.value = 'true'
+      itemFrozenEl.checked = false
+      setSelectedAllergens([])
       itemStatusEl.className = ''
       itemStatusEl.textContent = 'Stato piatto: pronto'
     }
@@ -675,6 +796,8 @@
       itemDescriptionEl.value = item.description || ''
       itemPriceEl.value = item.price ?? ''
       itemVisibleEl.value = item.visible ? 'true' : 'false'
+      itemFrozenEl.checked = !!item.is_frozen
+      setSelectedAllergens(Array.isArray(item.allergens) ? item.allergens : [])
       itemStatusEl.className = ''
       itemStatusEl.textContent = 'Stato piatto: modifica attiva'
       itemNameEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -691,8 +814,7 @@
         'Piatti collegati trovati: ' + itemsCount + '.\n\n' +
         'Vuoi continuare?'
 
-      const confirmed = window.confirm(message)
-      if (!confirmed) return
+      if (!window.confirm(message)) return
 
       adminStatusEl.className = ''
       adminStatusEl.textContent = 'Eliminazione categoria in corso...'
@@ -708,9 +830,7 @@
         return
       }
 
-      if (editingCategoryId === categoryId) {
-        resetCategoryForm()
-      }
+      if (editingCategoryId === categoryId) resetCategoryForm()
 
       adminStatusEl.className = 'success'
       adminStatusEl.textContent = 'Categoria eliminata con successo.'
@@ -723,10 +843,7 @@
       const item = allItems.find(i => i.id === itemId)
       if (!item) return
 
-      const confirmed = window.confirm(
-        'Stai per eliminare il piatto "' + item.name + '".\n\nVuoi continuare?'
-      )
-      if (!confirmed) return
+      if (!window.confirm('Stai per eliminare il piatto "' + item.name + '".\n\nVuoi continuare?')) return
 
       itemStatusEl.className = ''
       itemStatusEl.textContent = 'Eliminazione piatto in corso...'
@@ -742,9 +859,7 @@
         return
       }
 
-      if (editingItemId === itemId) {
-        resetItemForm()
-      }
+      if (editingItemId === itemId) resetItemForm()
 
       itemStatusEl.className = 'success'
       itemStatusEl.textContent = 'Piatto eliminato con successo.'
@@ -777,7 +892,9 @@
             description,
             price,
             visible,
-            sort_order
+            sort_order,
+            allergens,
+            is_frozen
           )
         `)
         .order('sort_order', { ascending: true })
@@ -836,7 +953,9 @@
                     <div class="menu-item-top">
                       <div style="flex:1">
                         <div class="menu-item-title-row">
-                          <div class="menu-item-name">${escapeHtml(item.name)}</div>
+                          <div class="menu-item-name">
+                            ${escapeHtml(item.name)}${item.is_frozen ? '*' : ''}${formatAllergenSup(Array.isArray(item.allergens) ? item.allergens : [])}
+                          </div>
                           ${isStaffAuthenticated ? `
                             <div class="menu-item-actions">
                               <button class="mini-btn secondary-btn edit-item-btn" data-item-id="${item.id}" type="button">Modifica</button>
@@ -894,9 +1013,7 @@
         </div>
       `).join('')
 
-      if (sortableInstance) {
-        sortableInstance.destroy()
-      }
+      if (sortableInstance) sortableInstance.destroy()
 
       sortableInstance = Sortable.create(sortableCategoriesEl, {
         animation: 150,
@@ -1144,6 +1261,8 @@
       const description = itemDescriptionEl.value.trim()
       const price = Number(itemPriceEl.value)
       const visible = itemVisibleEl.value === 'true'
+      const is_frozen = itemFrozenEl.checked
+      const allergens = getSelectedAllergens()
 
       if (!category_id) {
         itemStatusEl.className = 'error'
@@ -1176,7 +1295,9 @@
             name,
             description: description || null,
             price,
-            visible
+            visible,
+            allergens,
+            is_frozen
           })
           .eq('id', editingItemId)
 
@@ -1206,6 +1327,8 @@
             description: description || null,
             price,
             visible,
+            allergens,
+            is_frozen,
             sort_order: nextSortOrder
           })
 
@@ -1271,6 +1394,8 @@
     cancelCategoryEditBtn.addEventListener('click', resetCategoryForm)
     cancelItemEditBtn.addEventListener('click', resetItemForm)
 
+    renderAllergenCheckboxes()
+    renderLegend()
     loadPublicMenu()
     updateAuthState()
   </script>
