@@ -106,6 +106,14 @@
       background: #92400e;
     }
 
+    .danger-btn {
+      background: #b91c1c;
+    }
+
+    .danger-btn:hover {
+      background: #991b1b;
+    }
+
     .actions,
     .button-row,
     .inline-actions {
@@ -269,6 +277,10 @@
 
     .mini-btn.secondary-btn {
       background: #374151;
+    }
+
+    .mini-btn.danger-btn {
+      background: #b91c1c;
     }
 
     .menu-items {
@@ -567,6 +579,7 @@
     let cachedFullMenu = []
     let editingCategoryId = null
     let editingItemId = null
+    let isStaffAuthenticated = false
 
     function slugify(text) {
       return text
@@ -667,6 +680,77 @@
       itemNameEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
 
+    async function deleteCategory(categoryId) {
+      const category = cachedFullMenu.find(c => c.id === categoryId) || cachedCategories.find(c => c.id === categoryId)
+      if (!category) return
+
+      const itemsCount = (category.menu_items || []).length
+      const message =
+        'Stai per eliminare la categoria "' + category.name + '".\n\n' +
+        'ATTENZIONE: verranno eliminati anche tutti i piatti collegati a questa categoria.\n' +
+        'Piatti collegati trovati: ' + itemsCount + '.\n\n' +
+        'Vuoi continuare?'
+
+      const confirmed = window.confirm(message)
+      if (!confirmed) return
+
+      adminStatusEl.className = ''
+      adminStatusEl.textContent = 'Eliminazione categoria in corso...'
+
+      const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', categoryId)
+
+      if (error) {
+        adminStatusEl.className = 'error'
+        adminStatusEl.textContent = 'Errore eliminazione categoria: ' + error.message
+        return
+      }
+
+      if (editingCategoryId === categoryId) {
+        resetCategoryForm()
+      }
+
+      adminStatusEl.className = 'success'
+      adminStatusEl.textContent = 'Categoria eliminata con successo.'
+      await refreshStaffData()
+      await loadPublicMenu()
+    }
+
+    async function deleteItem(itemId) {
+      const allItems = cachedFullMenu.flatMap(category => category.menu_items || [])
+      const item = allItems.find(i => i.id === itemId)
+      if (!item) return
+
+      const confirmed = window.confirm(
+        'Stai per eliminare il piatto "' + item.name + '".\n\nVuoi continuare?'
+      )
+      if (!confirmed) return
+
+      itemStatusEl.className = ''
+      itemStatusEl.textContent = 'Eliminazione piatto in corso...'
+
+      const { error } = await supabase
+        .from('menu_items')
+        .delete()
+        .eq('id', itemId)
+
+      if (error) {
+        itemStatusEl.className = 'error'
+        itemStatusEl.textContent = 'Errore eliminazione piatto: ' + error.message
+        return
+      }
+
+      if (editingItemId === itemId) {
+        resetItemForm()
+      }
+
+      itemStatusEl.className = 'success'
+      itemStatusEl.textContent = 'Piatto eliminato con successo.'
+      await loadPublicMenu()
+    }
+
     async function fetchCategoriesOnly() {
       const { data, error } = await supabase
         .from('categories')
@@ -707,14 +791,12 @@
     }
 
     function populateCategorySelect() {
-      const availableCategories = cachedCategories
-
-      if (!availableCategories.length) {
+      if (!cachedCategories.length) {
         itemCategoryEl.innerHTML = '<option value="">Nessuna categoria disponibile</option>'
         return
       }
 
-      itemCategoryEl.innerHTML = availableCategories.map(category => `
+      itemCategoryEl.innerHTML = cachedCategories.map(category => `
         <option value="${category.id}">${escapeHtml(category.name)}${category.visible ? '' : ' (nascosta)'}</option>
       `).join('')
     }
@@ -738,9 +820,12 @@
                   <div class="menu-category-title">${escapeHtml(category.name)}</div>
                   <div class="menu-category-slug">${escapeHtml(category.slug)}</div>
                 </div>
-                <div class="menu-category-header-actions">
-                  <button class="mini-btn edit-category-btn" data-category-id="${category.id}" type="button">Modifica</button>
-                </div>
+                ${isStaffAuthenticated ? `
+                  <div class="menu-category-header-actions">
+                    <button class="mini-btn edit-category-btn" data-category-id="${category.id}" type="button">Modifica</button>
+                    <button class="mini-btn danger-btn delete-category-btn" data-category-id="${category.id}" type="button">Elimina</button>
+                  </div>
+                ` : ''}
               </div>
             </div>
 
@@ -752,9 +837,12 @@
                       <div style="flex:1">
                         <div class="menu-item-title-row">
                           <div class="menu-item-name">${escapeHtml(item.name)}</div>
-                          <div class="menu-item-actions">
-                            <button class="mini-btn secondary-btn edit-item-btn" data-item-id="${item.id}" type="button">Modifica</button>
-                          </div>
+                          ${isStaffAuthenticated ? `
+                            <div class="menu-item-actions">
+                              <button class="mini-btn secondary-btn edit-item-btn" data-item-id="${item.id}" type="button">Modifica</button>
+                              <button class="mini-btn danger-btn delete-item-btn" data-item-id="${item.id}" type="button">Elimina</button>
+                            </div>
+                          ` : ''}
                         </div>
                         ${item.description ? `<div class="menu-item-description">${escapeHtml(item.description)}</div>` : ''}
                         <div class="menu-item-meta">Ordine: ${item.sort_order ?? '-'}</div>
@@ -774,8 +862,16 @@
         btn.addEventListener('click', () => startCategoryEdit(btn.dataset.categoryId))
       })
 
+      document.querySelectorAll('.delete-category-btn').forEach(btn => {
+        btn.addEventListener('click', () => deleteCategory(btn.dataset.categoryId))
+      })
+
       document.querySelectorAll('.edit-item-btn').forEach(btn => {
         btn.addEventListener('click', () => startItemEdit(btn.dataset.itemId))
+      })
+
+      document.querySelectorAll('.delete-item-btn').forEach(btn => {
+        btn.addEventListener('click', () => deleteItem(btn.dataset.itemId))
       })
     }
 
@@ -850,6 +946,7 @@
       const session = data.session
 
       if (session && session.user) {
+        isStaffAuthenticated = true
         authStatusEl.className = 'success'
         authStatusEl.textContent = 'Stato login: autenticato come ' + session.user.email
         adminBoxEl.classList.remove('hidden')
@@ -858,6 +955,7 @@
         sortBoxEl.classList.remove('hidden')
         await refreshStaffData()
       } else {
+        isStaffAuthenticated = false
         authStatusEl.className = ''
         authStatusEl.textContent = 'Stato login: non autenticato'
         adminBoxEl.classList.add('hidden')
@@ -865,6 +963,8 @@
         changePasswordBoxEl.classList.add('hidden')
         sortBoxEl.classList.add('hidden')
       }
+
+      renderPublicMenu()
     }
 
     async function login() {
