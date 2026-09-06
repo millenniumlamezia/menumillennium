@@ -780,7 +780,7 @@
         </div>
       </div>
 
-      <!-- SEZIONE STAMPA MENU - AGGIUNTA -->
+      <!-- SEZIONE STAMPA MENU -->
       <div id="printAccordion" class="accordion-item hidden" data-staff-section="print-menu">
         <button class="accordion-trigger" type="button" data-accordion-trigger>
           <div class="accordion-trigger-left">
@@ -850,7 +850,7 @@
     const sortAccordionEl = document.getElementById('sortAccordion')
     const itemSortAccordionEl = document.getElementById('itemSortAccordion')
     const staffManagerAccordionEl = document.getElementById('staffManagerAccordion')
-    const printAccordionEl = document.getElementById('printAccordion') // AGGIUNTO
+    const printAccordionEl = document.getElementById('printAccordion')
 
     const adminStatusEl = document.getElementById('adminStatus')
     const categoryNameEl = document.getElementById('categoryName')
@@ -884,7 +884,6 @@
     const reloadItemSortBtn = document.getElementById('reloadItemSortBtn')
     const itemSortStatusEl = document.getElementById('itemSortStatus')
 
-    // Variabili per la stampa
     const printCategoriesListEl = document.getElementById('printCategoriesList')
     const selectAllPrintCategoriesBtn = document.getElementById('selectAllPrintCategoriesBtn')
     const clearAllPrintCategoriesBtn = document.getElementById('clearAllPrintCategoriesBtn')
@@ -1030,7 +1029,7 @@
         sortAccordionEl,
         itemSortAccordionEl,
         staffManagerAccordionEl,
-        printAccordionEl // AGGIUNTO
+        printAccordionEl
       ].forEach(item => item && closeAccordionItem(item))
     }
 
@@ -1041,7 +1040,7 @@
         sortAccordionEl,
         itemSortAccordionEl,
         staffManagerAccordionEl,
-        printAccordionEl // AGGIUNTO
+        printAccordionEl
       ].forEach(el => el.classList.toggle('hidden', !show))
     }
 
@@ -1236,6 +1235,7 @@
             <button class="accordion-trigger" type="button" data-accordion-trigger>
               <div class="accordion-trigger-left">
                 <div class="accordion-title">${escapeHtml(category.name)}</div>
+                <div class="accordion-subtitle">${visibleItems.length} ${visibleItems.length === 1 ? 'piatto visibile' : 'piatti visibili'}</div>
               </div>
               <div class="accordion-icon">+</div>
             </button>
@@ -1376,6 +1376,11 @@
         `
       }).join('')
 
+      // Genera la legenda degli allergeni per la stampa
+      const legendItems = ALLERGENS.map(allergen => 
+        `<span class="print-legend-item"><strong>${allergen.id}</strong> ${escapeHtml(allergen.label)}</span>`
+      ).join(' · ')
+
       return `
         <!DOCTYPE html>
         <html lang="it">
@@ -1384,21 +1389,140 @@
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <title>Millennium Menu - Stampa</title>
           <style>
-            @page { size: A4; margin: 16mm; }
-            body { margin: 0; color: #1f1b16; background: #ffffff; font-family: Arial, sans-serif; line-height: 1.45; }
-            .print-wrap { width: 100%; }
-            .print-title { text-align: center; font-size: 30px; font-weight: 700; margin-bottom: 18px; }
-            .print-category { margin-bottom: 22px; page-break-inside: avoid; }
-            .print-category h2 { font-size: 20px; margin: 0 0 10px; padding-bottom: 6px; border-bottom: 1px solid #d9d4cc; }
-            .print-item { padding: 8px 0; border-bottom: 1px dashed #ddd6cd; }
-            .print-item:last-child { border-bottom: none; }
-            .print-item-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
-            .print-item-name { font-size: 16px; font-weight: 700; }
-            .print-item-name sup { font-size: 11px; font-weight: 400; }
-            .print-item-price { white-space: nowrap; font-size: 16px; font-weight: 700; }
-            .print-item-description { margin-top: 4px; font-size: 14px; color: #4f4a43; }
-            .print-empty { font-size: 14px; color: #6a635b; font-style: italic; }
-            .print-legend { margin-top: 28px; padding-top: 10px; border-top: 1px solid #d9d4cc; font-size: 12px; color: #5a554e; }
+            @import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap');
+            
+            @font-face {
+              font-family: 'Harlekin';
+              src: url('./assets/fonts/Harlekin.otf') format('opentype');
+              font-weight: 400;
+              font-style: normal;
+              font-display: swap;
+            }
+
+            @page { 
+              size: A4; 
+              margin: 16mm; 
+            }
+            
+            body { 
+              margin: 0; 
+              color: #1f1b16; 
+              background: #ffffff; 
+              font-family: 'Satoshi', Arial, sans-serif; 
+              line-height: 1.45; 
+            }
+            
+            .print-wrap { 
+              width: 100%; 
+            }
+            
+            .print-title { 
+              text-align: center; 
+              font-size: 38px; 
+              font-weight: 400; 
+              font-family: 'Harlekin', cursive;
+              margin-bottom: 24px; 
+              letter-spacing: 1px;
+            }
+            
+            .print-category { 
+              margin-bottom: 22px; 
+              page-break-inside: avoid; 
+            }
+            
+            .print-category h2 { 
+              font-size: 20px; 
+              margin: 0 0 10px; 
+              padding-bottom: 6px; 
+              border-bottom: 1px solid #d9d4cc; 
+              font-weight: 700;
+            }
+            
+            .print-item { 
+              padding: 8px 0; 
+              border-bottom: 1px dashed #ddd6cd; 
+            }
+            
+            .print-item:last-child { 
+              border-bottom: none; 
+            }
+            
+            .print-item-head { 
+              display: flex; 
+              justify-content: space-between; 
+              gap: 16px; 
+              align-items: flex-start; 
+            }
+            
+            .print-item-name { 
+              font-size: 16px; 
+              font-weight: 700; 
+            }
+            
+            .print-item-name sup { 
+              font-size: 11px; 
+              font-weight: 400; 
+              color: #666;
+            }
+            
+            .print-item-price { 
+              white-space: nowrap; 
+              font-size: 16px; 
+              font-weight: 700; 
+              color: #01696f;
+            }
+            
+            .print-item-description { 
+              margin-top: 4px; 
+              font-size: 14px; 
+              color: #4f4a43; 
+            }
+            
+            .print-empty { 
+              font-size: 14px; 
+              color: #6a635b; 
+              font-style: italic; 
+            }
+            
+            .print-legend { 
+              margin-top: 28px; 
+              padding-top: 14px; 
+              border-top: 1px solid #d9d4cc; 
+              font-size: 11px; 
+              color: #5a554e; 
+              line-height: 1.6;
+            }
+            
+            .print-legend strong {
+              font-weight: 700;
+              color: #1f1b16;
+            }
+
+            .print-legend-item {
+              display: inline-block;
+              margin-right: 8px;
+            }
+
+            .print-legend-title {
+              display: block;
+              font-weight: 700;
+              font-size: 12px;
+              color: #1f1b16;
+              margin-bottom: 4px;
+            }
+
+            .print-legend .print-legend-note {
+              display: block;
+              margin-top: 6px;
+              font-size: 10px;
+              color: #7a756e;
+            }
+
+            @media print {
+              .print-title {
+                font-size: 42px;
+              }
+            }
           </style>
         </head>
         <body>
@@ -1406,8 +1530,10 @@
             <div class="print-title">Millennium Menu</div>
             ${printableSections}
             <div class="print-legend">
-              * Prodotto surgelato.<br>
-              I numeri in piccolo accanto ai piatti indicano gli allergeni.
+              <span class="print-legend-title">Legenda allergeni</span>
+              <span class="print-legend-item"><strong>*</strong> Prodotto surgelato</span>
+              ${legendItems}
+              <span class="print-legend-note">I numeri in piccolo accanto ai piatti indicano gli allergeni presenti.</span>
             </div>
           </div>
         </body>
@@ -1531,7 +1657,7 @@
         renderPublicMenu()
         renderSortableItems()
         renderStaffManager()
-        renderPrintCategories() // AGGIUNTO
+        renderPrintCategories()
         statusEl.className = 'hidden'
         statusEl.textContent = ''
         statusEl.setAttribute('aria-hidden', 'true')
@@ -1551,7 +1677,7 @@
         populateCategorySelect()
         renderSortableCategories()
         renderSortableItems()
-        renderPrintCategories() // AGGIUNTO
+        renderPrintCategories()
         sortStatusEl.className = 'success'
         sortStatusEl.textContent = 'Elenco categorie aggiornato.'
       } catch (error) {
@@ -1590,7 +1716,7 @@
 
       renderPublicMenu()
       renderStaffManager()
-      renderPrintCategories() // AGGIUNTO
+      renderPrintCategories()
     }
 
     async function login() {
@@ -1820,7 +1946,6 @@
         .subscribe()
     }
 
-    // Event listeners per la stampa
     function selectAllPrintCategories() {
       document.querySelectorAll('.print-category-checkbox').forEach(cb => cb.checked = true)
     }
@@ -1854,7 +1979,6 @@
       if (event.key === 'Escape') closeStaffDrawer()
     })
 
-    // Aggiungi event listeners per la stampa
     selectAllPrintCategoriesBtn.addEventListener('click', selectAllPrintCategories)
     clearAllPrintCategoriesBtn.addEventListener('click', clearAllPrintCategories)
     printMenuBtn.addEventListener('click', printSelectedMenu)
