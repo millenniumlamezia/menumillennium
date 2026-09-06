@@ -7,6 +7,10 @@
   <style>
     * { box-sizing: border-box; }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -129,7 +133,8 @@
     #itemStatus,
     #passwordStatus,
     #recoveryStatus,
-    #sortStatus {
+    #sortStatus,
+    #itemSortStatus {
       margin: 14px 0;
       padding: 12px 14px;
       border-radius: 10px;
@@ -158,7 +163,8 @@
 
     #passwordStatus,
     #recoveryStatus,
-    #sortStatus {
+    #sortStatus,
+    #itemSortStatus {
       background: #f5f3ff;
       border: 1px solid #ddd6fe;
     }
@@ -228,26 +234,65 @@
       font-size: 14px;
     }
 
+    .menu-sticky-nav {
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+      margin: 18px 0 10px;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.96);
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+      backdrop-filter: blur(8px);
+    }
+
+    .menu-sticky-nav-label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .menu-sticky-links {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: thin;
+    }
+
+    .menu-sticky-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      padding: 8px 12px;
+      border-radius: 999px;
+      text-decoration: none;
+      background: #f3f4f6;
+      color: #1f2937;
+      border: 1px solid #e5e7eb;
+      font-size: 14px;
+    }
+
+    .menu-sticky-link:hover {
+      background: #e5e7eb;
+    }
+
     .menu-category {
       margin-top: 18px;
       border: 1px solid #e5e7eb;
       border-radius: 14px;
       background: #fff;
       overflow: hidden;
+      scroll-margin-top: 90px;
     }
 
     .menu-category-header {
       padding: 16px;
       border-bottom: 1px solid #f0f0f0;
       background: #fcfcfc;
-    }
-
-    .menu-category-title-row,
-    .menu-item-title-row {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
     }
 
     .menu-category-title {
@@ -259,28 +304,6 @@
     .menu-category-slug {
       color: #777;
       font-size: 13px;
-    }
-
-    .menu-category-header-actions,
-    .menu-item-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .mini-btn {
-      padding: 8px 10px;
-      font-size: 13px;
-      border-radius: 8px;
-      background: #0f766e;
-    }
-
-    .mini-btn.secondary-btn {
-      background: #374151;
-    }
-
-    .mini-btn.danger-btn {
-      background: #b91c1c;
     }
 
     .menu-items {
@@ -296,7 +319,8 @@
       background: #ffffff;
     }
 
-    .menu-item-top {
+    .menu-item-top,
+    .staff-item-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -443,6 +467,47 @@
     .ghost {
       opacity: 0.4;
     }
+
+    .staff-section {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .staff-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .staff-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .mini-btn {
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    .mini-btn.secondary-btn {
+      background: #374151;
+    }
+
+    .mini-btn.danger-btn {
+      background: #b91c1c;
+    }
+
+    .category-block {
+      margin-bottom: 18px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed #d1d5db;
+    }
   </style>
 </head>
 <body>
@@ -460,18 +525,19 @@
         </div>
 
         <div id="status">Stato: pronto</div>
+        <div id="stickyCategories"></div>
         <div id="publicMenu"></div>
 
         <div class="legend-box">
           <h3>Legenda</h3>
-          <p class="small">L’asterisco indica prodotto surgelato. I numeri in piccolo indicano gli allergeni presenti nel piatto. [web:427][web:429]</p>
+          <p class="small">L’asterisco indica prodotto surgelato. I numeri in piccolo indicano gli allergeni presenti nel piatto. [web:442][web:449]</p>
           <div class="legend-grid" id="legendGrid"></div>
         </div>
       </section>
 
       <section class="panel">
         <h2>Area staff</h2>
-        <p class="small">Login con password oppure recupero password direttamente dal sito.</p>
+        <p class="small">Solo lo staff autenticato può modificare contenuti, eliminare elementi e ordinare categorie o piatti. [web:446][web:450]</p>
 
         <label for="email">Email staff</label>
         <input type="email" id="email" placeholder="Email staff" />
@@ -572,11 +638,34 @@
           <div id="sortableCategories" class="sortable-list"></div>
 
           <div class="button-row">
-            <button id="saveSortBtn">Salva nuovo ordine</button>
-            <button id="reloadSortBtn" class="secondary-btn">Ricarica elenco</button>
+            <button id="saveSortBtn">Salva nuovo ordine categorie</button>
+            <button id="reloadSortBtn" class="secondary-btn">Ricarica elenco categorie</button>
           </div>
 
           <div id="sortStatus">Stato ordinamento: pronto</div>
+        </div>
+
+        <div id="itemSortBox" class="sort-box hidden">
+          <h3>Ordina piatti</h3>
+          <p class="small">Scegli una categoria e trascina i piatti per cambiare l’ordine di visualizzazione. SortableJS supporta bene il drag touch per liste riordinabili. [web:457][cite:1]</p>
+
+          <label for="itemSortCategory">Categoria da ordinare</label>
+          <select id="itemSortCategory"></select>
+
+          <div id="sortableItems" class="sortable-list"></div>
+
+          <div class="button-row">
+            <button id="saveItemSortBtn">Salva nuovo ordine piatti</button>
+            <button id="reloadItemSortBtn" class="secondary-btn">Ricarica elenco piatti</button>
+          </div>
+
+          <div id="itemSortStatus">Stato ordinamento piatti: pronto</div>
+        </div>
+
+        <div id="staffManager" class="staff-section hidden">
+          <h3>Gestione rapida staff</h3>
+          <p class="small">I pulsanti Modifica ed Elimina sono qui dentro, non nel menu cliente.</p>
+          <div id="staffCategoriesManager"></div>
         </div>
       </section>
     </div>
@@ -611,6 +700,7 @@
 
     const statusEl = document.getElementById('status')
     const publicMenuEl = document.getElementById('publicMenu')
+    const stickyCategoriesEl = document.getElementById('stickyCategories')
     const loadMenuBtn = document.getElementById('loadMenuBtn')
     const legendGridEl = document.getElementById('legendGrid')
 
@@ -658,12 +748,24 @@
     const reloadSortBtn = document.getElementById('reloadSortBtn')
     const sortStatusEl = document.getElementById('sortStatus')
 
-    let sortableInstance = null
+    const itemSortBoxEl = document.getElementById('itemSortBox')
+    const itemSortCategoryEl = document.getElementById('itemSortCategory')
+    const sortableItemsEl = document.getElementById('sortableItems')
+    const saveItemSortBtn = document.getElementById('saveItemSortBtn')
+    const reloadItemSortBtn = document.getElementById('reloadItemSortBtn')
+    const itemSortStatusEl = document.getElementById('itemSortStatus')
+
+    const staffManagerEl = document.getElementById('staffManager')
+    const staffCategoriesManagerEl = document.getElementById('staffCategoriesManager')
+
+    let sortableCategoriesInstance = null
+    let sortableItemsInstance = null
     let cachedCategories = []
     let cachedFullMenu = []
     let editingCategoryId = null
     let editingItemId = null
     let isStaffAuthenticated = false
+    let realtimeChannel = null
 
     function slugify(text) {
       return text
@@ -834,8 +936,7 @@
 
       adminStatusEl.className = 'success'
       adminStatusEl.textContent = 'Categoria eliminata con successo.'
-      await refreshStaffData()
-      await loadPublicMenu()
+      await refreshAllData()
     }
 
     async function deleteItem(itemId) {
@@ -863,7 +964,7 @@
 
       itemStatusEl.className = 'success'
       itemStatusEl.textContent = 'Piatto eliminato con successo.'
-      await loadPublicMenu()
+      await refreshAllData()
     }
 
     async function fetchCategoriesOnly() {
@@ -910,12 +1011,36 @@
     function populateCategorySelect() {
       if (!cachedCategories.length) {
         itemCategoryEl.innerHTML = '<option value="">Nessuna categoria disponibile</option>'
+        itemSortCategoryEl.innerHTML = '<option value="">Nessuna categoria disponibile</option>'
         return
       }
 
-      itemCategoryEl.innerHTML = cachedCategories.map(category => `
+      const optionsHtml = cachedCategories.map(category => `
         <option value="${category.id}">${escapeHtml(category.name)}${category.visible ? '' : ' (nascosta)'}</option>
       `).join('')
+
+      itemCategoryEl.innerHTML = optionsHtml
+      itemSortCategoryEl.innerHTML = optionsHtml
+    }
+
+    function renderStickyCategories() {
+      const visibleCategories = cachedFullMenu.filter(category => category.visible)
+
+      if (!visibleCategories.length) {
+        stickyCategoriesEl.innerHTML = ''
+        return
+      }
+
+      stickyCategoriesEl.innerHTML = `
+        <div class="menu-sticky-nav">
+          <div class="menu-sticky-nav-label">Vai alla categoria</div>
+          <div class="menu-sticky-links">
+            ${visibleCategories.map(category => `
+              <a class="menu-sticky-link" href="#category-${category.id}">${escapeHtml(category.name)}</a>
+            `).join('')}
+          </div>
+        </div>
+      `
     }
 
     function renderPublicMenu() {
@@ -923,27 +1048,20 @@
 
       if (!visibleCategories.length) {
         publicMenuEl.innerHTML = '<div class="empty">Nessuna categoria visibile nel menu.</div>'
+        stickyCategoriesEl.innerHTML = ''
         return
       }
+
+      renderStickyCategories()
 
       publicMenuEl.innerHTML = visibleCategories.map(category => {
         const visibleItems = (category.menu_items || []).filter(item => item.visible)
 
         return `
-          <div class="menu-category">
+          <div class="menu-category" id="category-${category.id}">
             <div class="menu-category-header">
-              <div class="menu-category-title-row">
-                <div>
-                  <div class="menu-category-title">${escapeHtml(category.name)}</div>
-                  <div class="menu-category-slug">${escapeHtml(category.slug)}</div>
-                </div>
-                ${isStaffAuthenticated ? `
-                  <div class="menu-category-header-actions">
-                    <button class="mini-btn edit-category-btn" data-category-id="${category.id}" type="button">Modifica</button>
-                    <button class="mini-btn danger-btn delete-category-btn" data-category-id="${category.id}" type="button">Elimina</button>
-                  </div>
-                ` : ''}
-              </div>
+              <div class="menu-category-title">${escapeHtml(category.name)}</div>
+              <div class="menu-category-slug">${escapeHtml(category.slug)}</div>
             </div>
 
             <div class="menu-items">
@@ -952,16 +1070,8 @@
                   <div class="menu-item">
                     <div class="menu-item-top">
                       <div style="flex:1">
-                        <div class="menu-item-title-row">
-                          <div class="menu-item-name">
-                            ${escapeHtml(item.name)}${item.is_frozen ? '*' : ''}${formatAllergenSup(Array.isArray(item.allergens) ? item.allergens : [])}
-                          </div>
-                          ${isStaffAuthenticated ? `
-                            <div class="menu-item-actions">
-                              <button class="mini-btn secondary-btn edit-item-btn" data-item-id="${item.id}" type="button">Modifica</button>
-                              <button class="mini-btn danger-btn delete-item-btn" data-item-id="${item.id}" type="button">Elimina</button>
-                            </div>
-                          ` : ''}
+                        <div class="menu-item-name">
+                          ${escapeHtml(item.name)}${item.is_frozen ? '*' : ''}${formatAllergenSup(Array.isArray(item.allergens) ? item.allergens : [])}
                         </div>
                         ${item.description ? `<div class="menu-item-description">${escapeHtml(item.description)}</div>` : ''}
                         <div class="menu-item-meta">Ordine: ${item.sort_order ?? '-'}</div>
@@ -976,22 +1086,6 @@
           </div>
         `
       }).join('')
-
-      document.querySelectorAll('.edit-category-btn').forEach(btn => {
-        btn.addEventListener('click', () => startCategoryEdit(btn.dataset.categoryId))
-      })
-
-      document.querySelectorAll('.delete-category-btn').forEach(btn => {
-        btn.addEventListener('click', () => deleteCategory(btn.dataset.categoryId))
-      })
-
-      document.querySelectorAll('.edit-item-btn').forEach(btn => {
-        btn.addEventListener('click', () => startItemEdit(btn.dataset.itemId))
-      })
-
-      document.querySelectorAll('.delete-item-btn').forEach(btn => {
-        btn.addEventListener('click', () => deleteItem(btn.dataset.itemId))
-      })
     }
 
     function renderSortableCategories() {
@@ -1013,15 +1107,122 @@
         </div>
       `).join('')
 
-      if (sortableInstance) sortableInstance.destroy()
+      if (sortableCategoriesInstance) {
+        sortableCategoriesInstance.destroy()
+      }
 
-      sortableInstance = Sortable.create(sortableCategoriesEl, {
+      sortableCategoriesInstance = Sortable.create(sortableCategoriesEl, {
         animation: 150,
         handle: '.drag-handle',
         ghostClass: 'ghost',
         delay: 120,
         delayOnTouchOnly: true,
         touchStartThreshold: 4
+      })
+    }
+
+    function renderSortableItems() {
+      const categoryId = itemSortCategoryEl.value
+
+      if (!categoryId) {
+        sortableItemsEl.innerHTML = '<div class="empty">Seleziona una categoria.</div>'
+        return
+      }
+
+      const category = cachedFullMenu.find(c => c.id === categoryId)
+      const items = category?.menu_items || []
+
+      if (!items.length) {
+        sortableItemsEl.innerHTML = '<div class="empty">Nessun piatto in questa categoria.</div>'
+        return
+      }
+
+      sortableItemsEl.innerHTML = items.map(item => `
+        <div class="sortable-item" data-id="${item.id}">
+          <div class="drag-handle">☰</div>
+          <div class="sortable-content">
+            <div class="sortable-title">${escapeHtml(item.name)}${item.is_frozen ? '*' : ''}</div>
+            <div class="sortable-subtitle">${escapeHtml(item.description || 'Nessuna descrizione')}</div>
+            <div class="tag">${item.visible ? 'Visibile' : 'Nascosto'} · Prezzo ${formatPrice(item.price)}</div>
+          </div>
+        </div>
+      `).join('')
+
+      if (sortableItemsInstance) {
+        sortableItemsInstance.destroy()
+      }
+
+      sortableItemsInstance = Sortable.create(sortableItemsEl, {
+        animation: 150,
+        handle: '.drag-handle',
+        ghostClass: 'ghost',
+        delay: 120,
+        delayOnTouchOnly: true,
+        touchStartThreshold: 4
+      })
+    }
+
+    function renderStaffManager() {
+      if (!isStaffAuthenticated) {
+        staffCategoriesManagerEl.innerHTML = ''
+        return
+      }
+
+      if (!cachedFullMenu.length) {
+        staffCategoriesManagerEl.innerHTML = '<div class="empty">Nessun contenuto disponibile.</div>'
+        return
+      }
+
+      staffCategoriesManagerEl.innerHTML = cachedFullMenu.map(category => `
+        <div class="category-block">
+          <div class="staff-card">
+            <div class="staff-item-row">
+              <div>
+                <strong>${escapeHtml(category.name)}</strong>
+                <div class="small">Slug: ${escapeHtml(category.slug)} · ${category.visible ? 'Visibile' : 'Nascosta'}</div>
+              </div>
+            </div>
+            <div class="staff-actions">
+              <button type="button" class="mini-btn secondary-btn staff-edit-category-btn" data-category-id="${category.id}">Modifica categoria</button>
+              <button type="button" class="mini-btn danger-btn staff-delete-category-btn" data-category-id="${category.id}">Elimina categoria</button>
+            </div>
+          </div>
+
+          ${(category.menu_items || []).length
+            ? category.menu_items.map(item => `
+              <div class="staff-card">
+                <div class="staff-item-row">
+                  <div>
+                    <strong>${escapeHtml(item.name)}${item.is_frozen ? '*' : ''}</strong>
+                    <div class="small">${escapeHtml(item.description || 'Nessuna descrizione')}</div>
+                    <div class="small">Prezzo: ${formatPrice(item.price)} · ${item.visible ? 'Visibile' : 'Nascosto'} · Ordine: ${item.sort_order ?? '-'}</div>
+                  </div>
+                </div>
+                <div class="staff-actions">
+                  <button type="button" class="mini-btn secondary-btn staff-edit-item-btn" data-item-id="${item.id}">Modifica piatto</button>
+                  <button type="button" class="mini-btn danger-btn staff-delete-item-btn" data-item-id="${item.id}">Elimina piatto</button>
+                </div>
+              </div>
+            `).join('')
+            : '<div class="empty">Nessun piatto in questa categoria.</div>'
+          }
+        </div>
+      `).join('')
+
+      document.querySelectorAll('.staff-edit-category-btn').forEach(btn => {
+        btn.addEventListener('click', () => startCategoryEdit(btn.dataset.categoryId))
+      })
+
+      document.querySelectorAll('.staff-delete-category-btn').forEach(btn => {
+        btn.addEventListener('click', () => deleteCategory(btn.dataset.categoryId))
+      })
+
+      document.querySelectorAll('.staff-edit-item-btn').forEach(btn => {
+        btn.addEventListener('click', () => startItemEdit(btn.dataset.itemId))
+      })
+
+      document.querySelectorAll('.staff-delete-item-btn').forEach(btn => {
+        btn.addEventListener('click', () => deleteItem(btn.dataset.itemId))
       })
     }
 
@@ -1032,6 +1233,8 @@
       try {
         cachedFullMenu = await fetchFullMenu()
         renderPublicMenu()
+        renderSortableItems()
+        renderStaffManager()
 
         const visibleCount = cachedFullMenu.filter(category => category.visible).length
         statusEl.className = 'success'
@@ -1050,12 +1253,18 @@
         cachedCategories = await fetchCategoriesOnly()
         populateCategorySelect()
         renderSortableCategories()
+        renderSortableItems()
         sortStatusEl.className = 'success'
-        sortStatusEl.textContent = 'Elenco ordinabile aggiornato.'
+        sortStatusEl.textContent = 'Elenco categorie aggiornato.'
       } catch (error) {
         sortStatusEl.className = 'error'
         sortStatusEl.textContent = 'Errore ordinamento: ' + error.message
       }
+    }
+
+    async function refreshAllData() {
+      await refreshStaffData()
+      await loadPublicMenu()
     }
 
     async function updateAuthState() {
@@ -1070,6 +1279,8 @@
         itemBoxEl.classList.remove('hidden')
         changePasswordBoxEl.classList.remove('hidden')
         sortBoxEl.classList.remove('hidden')
+        itemSortBoxEl.classList.remove('hidden')
+        staffManagerEl.classList.remove('hidden')
         await refreshStaffData()
       } else {
         isStaffAuthenticated = false
@@ -1079,9 +1290,12 @@
         itemBoxEl.classList.add('hidden')
         changePasswordBoxEl.classList.add('hidden')
         sortBoxEl.classList.add('hidden')
+        itemSortBoxEl.classList.add('hidden')
+        staffManagerEl.classList.add('hidden')
       }
 
       renderPublicMenu()
+      renderStaffManager()
     }
 
     async function login() {
@@ -1250,8 +1464,7 @@
         adminStatusEl.textContent = 'Categoria salvata con successo.'
       }
 
-      await refreshStaffData()
-      await loadPublicMenu()
+      await refreshAllData()
       resetCategoryForm()
     }
 
@@ -1342,7 +1555,7 @@
         itemStatusEl.textContent = 'Piatto salvato con successo.'
       }
 
-      await loadPublicMenu()
+      await refreshAllData()
       resetItemForm()
     }
 
@@ -1356,7 +1569,7 @@
       }
 
       sortStatusEl.className = ''
-      sortStatusEl.textContent = 'Salvataggio nuovo ordine in corso...'
+      sortStatusEl.textContent = 'Salvataggio nuovo ordine categorie in corso...'
 
       try {
         for (let i = 0; i < items.length; i++) {
@@ -1372,14 +1585,77 @@
         }
 
         sortStatusEl.className = 'success'
-        sortStatusEl.textContent = 'Nuovo ordine salvato con successo.'
-
-        await refreshStaffData()
-        await loadPublicMenu()
+        sortStatusEl.textContent = 'Nuovo ordine categorie salvato con successo.'
+        await refreshAllData()
       } catch (error) {
         sortStatusEl.className = 'error'
-        sortStatusEl.textContent = 'Errore salvataggio ordine: ' + error.message
+        sortStatusEl.textContent = 'Errore salvataggio ordine categorie: ' + error.message
       }
+    }
+
+    async function saveItemOrder() {
+      const categoryId = itemSortCategoryEl.value
+      const items = [...sortableItemsEl.querySelectorAll('.sortable-item')]
+
+      if (!categoryId) {
+        itemSortStatusEl.className = 'error'
+        itemSortStatusEl.textContent = 'Seleziona una categoria.'
+        return
+      }
+
+      if (!items.length) {
+        itemSortStatusEl.className = 'error'
+        itemSortStatusEl.textContent = 'Nessun piatto da ordinare.'
+        return
+      }
+
+      itemSortStatusEl.className = ''
+      itemSortStatusEl.textContent = 'Salvataggio nuovo ordine piatti in corso...'
+
+      try {
+        for (let i = 0; i < items.length; i++) {
+          const id = items[i].dataset.id
+          const newOrder = i + 1
+
+          const { error } = await supabase
+            .from('menu_items')
+            .update({ sort_order: newOrder })
+            .eq('id', id)
+
+          if (error) throw error
+        }
+
+        itemSortStatusEl.className = 'success'
+        itemSortStatusEl.textContent = 'Nuovo ordine piatti salvato con successo.'
+        await refreshAllData()
+      } catch (error) {
+        itemSortStatusEl.className = 'error'
+        itemSortStatusEl.textContent = 'Errore salvataggio ordine piatti: ' + error.message
+      }
+    }
+
+    function subscribeRealtime() {
+      if (realtimeChannel) {
+        supabase.removeChannel(realtimeChannel)
+      }
+
+      realtimeChannel = supabase
+        .channel('menu-realtime')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'categories'
+        }, async () => {
+          await refreshAllData()
+        })
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'menu_items'
+        }, async () => {
+          await refreshAllData()
+        })
+        .subscribe()
     }
 
     loadMenuBtn.addEventListener('click', loadPublicMenu)
@@ -1391,13 +1667,17 @@
     saveItemBtn.addEventListener('click', saveItem)
     saveSortBtn.addEventListener('click', saveCategoryOrder)
     reloadSortBtn.addEventListener('click', refreshStaffData)
+    saveItemSortBtn.addEventListener('click', saveItemOrder)
+    reloadItemSortBtn.addEventListener('click', renderSortableItems)
     cancelCategoryEditBtn.addEventListener('click', resetCategoryForm)
     cancelItemEditBtn.addEventListener('click', resetItemForm)
+    itemSortCategoryEl.addEventListener('change', renderSortableItems)
 
     renderAllergenCheckboxes()
     renderLegend()
-    loadPublicMenu()
-    updateAuthState()
+    await refreshAllData()
+    await updateAuthState()
+    subscribeRealtime()
   </script>
 </body>
 </html>
