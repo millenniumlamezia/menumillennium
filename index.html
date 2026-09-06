@@ -1,130 +1,268 @@
+
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Menu Millennium</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
-
-    html {
-      scroll-behavior: smooth;
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+      --space-16: 4rem;
+      --color-bg: #f7f6f2;
+      --color-surface: #f9f8f5;
+      --color-surface-2: #fbfbf9;
+      --color-surface-offset: #f3f0ec;
+      --color-divider: #dcd9d5;
+      --color-border: #d4d1ca;
+      --color-text: #28251d;
+      --color-text-muted: #6d6a63;
+      --color-text-faint: #908d86;
+      --color-text-inverse: #f9f8f4;
+      --color-primary: #01696f;
+      --color-primary-hover: #0c4e54;
+      --color-primary-active: #0f3638;
+      --color-primary-highlight: #d9ece8;
+      --color-warning: #964219;
+      --color-warning-hover: #713417;
+      --color-error: #a12c7b;
+      --color-notification: #a13544;
+      --color-success: #437a22;
+      --shadow-sm: 0 1px 2px rgba(26, 23, 18, 0.06);
+      --shadow-md: 0 8px 24px rgba(26, 23, 18, 0.08);
+      --shadow-lg: 0 18px 48px rgba(26, 23, 18, 0.14);
+      --radius-sm: 0.5rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+      --radius-xl: 1.25rem;
+      --radius-full: 9999px;
+      --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+      --font-body: 'Satoshi', Arial, sans-serif;
+      --font-display: 'Satoshi', Arial, sans-serif;
+      --content-default: 960px;
+      --content-wide: 1200px;
     }
 
+    [data-theme="dark"] {
+      --color-bg: #171614;
+      --color-surface: #1c1b19;
+      --color-surface-2: #201f1d;
+      --color-surface-offset: #262320;
+      --color-divider: #2b2927;
+      --color-border: #393836;
+      --color-text: #ece8df;
+      --color-text-muted: #b8b2a7;
+      --color-text-faint: #8e887d;
+      --color-text-inverse: #1d1b18;
+      --color-primary: #4f98a3;
+      --color-primary-hover: #67a8b2;
+      --color-primary-active: #2f7782;
+      --color-primary-highlight: #26373a;
+      --color-warning: #bb653b;
+      --color-warning-hover: #cf7a50;
+      --color-error: #d163a7;
+      --color-notification: #dd6974;
+      --color-success: #6daa45;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.22);
+      --shadow-md: 0 10px 26px rgba(0,0,0,0.28);
+      --shadow-lg: 0 22px 52px rgba(0,0,0,0.42);
+    }
+
+    * , *::before, *::after { box-sizing: border-box; }
+    html {
+      -moz-text-size-adjust: none;
+      -webkit-text-size-adjust: none;
+      text-size-adjust: none;
+      scroll-behavior: smooth;
+      scroll-padding-top: var(--space-16);
+    }
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      color: #222;
-      padding: 20px;
+      min-height: 100dvh;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: 1.6;
+      color: var(--color-text);
+      background: linear-gradient(180deg, var(--color-bg), var(--color-surface-offset));
+      padding: var(--space-4);
     }
-
-    .container {
-      max-width: 1280px;
-      margin: 0 auto;
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 24px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    body.staff-open { overflow: hidden; }
+    img, svg { display: block; max-width: 100%; }
+    input, button, textarea, select { font: inherit; color: inherit; }
+    a, button, input, textarea, select {
+      transition: color var(--transition-interactive), background var(--transition-interactive), border-color var(--transition-interactive), box-shadow var(--transition-interactive), opacity var(--transition-interactive), transform var(--transition-interactive);
     }
-
-    h1, h2, h3, h4 { margin-top: 0; }
-
-    .subtitle,
-    .small {
-      color: #666;
+    :focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 3px;
+      border-radius: var(--radius-sm);
     }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
-
-    @media (min-width: 1100px) {
-      .grid {
-        grid-template-columns: 1.05fr 0.95fr;
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
       }
     }
 
-    .panel {
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 18px;
-      background: #fafafa;
+    .skip-link {
+      position: absolute;
+      left: var(--space-4);
+      top: -40px;
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-primary);
+      color: var(--color-text-inverse);
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      z-index: 2000;
+    }
+    .skip-link:focus { top: var(--space-4); }
+
+    .shell {
+      max-width: var(--content-wide);
+      margin: 0 auto;
+      background: color-mix(in srgb, var(--color-surface-2) 92%, transparent);
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
     }
 
-    input, select, textarea, button {
-      font: inherit;
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: var(--space-5) var(--space-5) var(--space-4);
+      border-bottom: 1px solid color-mix(in srgb, var(--color-text) 8%, transparent);
+      background: color-mix(in srgb, var(--color-surface) 95%, transparent);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 72%, white));
+      color: white;
+      display: grid;
+      place-items: center;
+      box-shadow: var(--shadow-md);
+      flex-shrink: 0;
+    }
+    .brand-title {
+      font-size: var(--text-xl);
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      font-family: var(--font-display);
+    }
+    .brand-subtitle {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--space-1);
+    }
+    .theme-toggle {
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: var(--radius-full);
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+      background: var(--color-surface);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+    }
+    .theme-toggle:hover { background: var(--color-surface-offset); }
+
+    main {
+      padding: var(--space-5);
+    }
+
+    .panel {
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+      box-shadow: var(--shadow-sm);
+    }
+    .panel + .panel { margin-top: var(--space-5); }
+
+    h1, h2, h3, h4 { margin: 0; line-height: 1.15; }
+    h2 { font-size: var(--text-xl); margin-bottom: var(--space-3); }
+    h3 { font-size: var(--text-lg); margin-bottom: var(--space-3); }
+    .small, .subtitle {
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
     }
 
     input, select, textarea {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      background: #fff;
+      padding: 0.9rem 1rem;
+      margin-bottom: var(--space-3);
+      border: 1px solid color-mix(in srgb, var(--color-text) 14%, transparent);
+      border-radius: var(--radius-md);
+      background: var(--color-surface-2);
       font-size: 16px;
     }
-
-    textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
-
+    textarea { min-height: 100px; resize: vertical; }
     label {
       display: block;
-      margin-bottom: 6px;
-      font-size: 14px;
-      font-weight: bold;
+      margin-bottom: var(--space-2);
+      font-size: var(--text-sm);
+      font-weight: 700;
     }
 
     button {
-      background: #0f766e;
-      color: white;
+      min-height: 44px;
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius-md);
       border: none;
-      border-radius: 10px;
-      padding: 12px 18px;
-      font-size: 16px;
+      background: var(--color-primary);
+      color: var(--color-text-inverse);
       cursor: pointer;
+      box-shadow: var(--shadow-sm);
     }
-
-    button:hover {
-      background: #115e59;
+    button:hover { background: var(--color-primary-hover); }
+    button:active { background: var(--color-primary-active); transform: translateY(1px); }
+    .secondary-btn { background: #374151; color: #fff; }
+    .secondary-btn:hover { background: #1f2937; }
+    .warning-btn { background: var(--color-warning); color: #fff; }
+    .warning-btn:hover { background: var(--color-warning-hover); }
+    .danger-btn { background: var(--color-notification); color: #fff; }
+    .danger-btn:hover { background: color-mix(in srgb, var(--color-notification) 85%, black); }
+    .ghost-btn {
+      background: transparent;
+      color: var(--color-text);
+      border: 1px solid color-mix(in srgb, var(--color-text) 14%, transparent);
+      box-shadow: none;
     }
+    .ghost-btn:hover { background: var(--color-surface-offset); }
 
-    .secondary-btn {
-      background: #374151;
-    }
-
-    .secondary-btn:hover {
-      background: #1f2937;
-    }
-
-    .warning-btn {
-      background: #b45309;
-    }
-
-    .warning-btn:hover {
-      background: #92400e;
-    }
-
-    .danger-btn {
-      background: #b91c1c;
-    }
-
-    .danger-btn:hover {
-      background: #991b1b;
-    }
-
-    .actions,
-    .button-row,
-    .inline-actions {
+    .actions, .button-row, .inline-actions, .staff-actions {
       display: flex;
-      gap: 10px;
+      gap: var(--space-2);
       flex-wrap: wrap;
-      margin: 16px 0;
+      margin: var(--space-4) 0;
     }
 
     #status,
@@ -135,268 +273,184 @@
     #recoveryStatus,
     #sortStatus,
     #itemSortStatus {
-      margin: 14px 0;
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-size: 15px;
+      margin: var(--space-3) 0;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
+      background: var(--color-surface-2);
+      font-size: var(--text-sm);
     }
 
-    #status {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-    }
-
-    #authStatus {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-    }
-
-    #adminStatus {
-      background: #fff7ed;
-      border: 1px solid #fed7aa;
-    }
-
-    #itemStatus {
-      background: #fefce8;
-      border: 1px solid #fde68a;
-    }
-
-    #passwordStatus,
-    #recoveryStatus,
-    #sortStatus,
-    #itemSortStatus {
-      background: #f5f3ff;
-      border: 1px solid #ddd6fe;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .success {
-      color: #166534;
-    }
-
-    .error {
-      color: #991b1b;
-    }
-
+    .hidden { display: none !important; }
+    .success { color: var(--color-success); }
+    .error { color: var(--color-error); }
     .empty {
-      padding: 16px;
-      border: 1px dashed #ccc;
-      border-radius: 12px;
-      background: #fafafa;
-      color: #555;
+      padding: var(--space-4);
+      border: 1px dashed color-mix(in srgb, var(--color-text) 18%, transparent);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      color: var(--color-text-muted);
     }
 
-    .admin-box,
-    .password-box,
-    .recovery-box,
-    .sort-box,
-    .item-box {
-      margin-top: 16px;
-      padding: 14px;
-      border-radius: 12px;
-    }
-
-    .admin-box {
-      background: #ecfeff;
-      border: 1px solid #a5f3fc;
-    }
-
-    .item-box {
-      background: #fefce8;
-      border: 1px solid #fde68a;
-    }
-
-    .password-box {
-      background: #eefcf2;
-      border: 1px solid #bbf7d0;
-    }
-
-    .recovery-box {
-      background: #faf5ff;
-      border: 1px solid #d8b4fe;
-    }
-
-    .sort-box {
-      background: #fffaf0;
-      border: 1px solid #fde68a;
+    .admin-box, .password-box, .recovery-box, .sort-box, .item-box {
+      margin-top: var(--space-4);
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
     }
 
     .edit-banner {
-      margin-bottom: 12px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: #fff;
-      border: 1px solid rgba(0,0,0,0.08);
-      color: #444;
-      font-size: 14px;
+      margin-bottom: var(--space-3);
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      background: var(--color-primary-highlight);
+      border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+      color: var(--color-text);
+      font-size: var(--text-sm);
     }
 
     .menu-sticky-nav {
       position: sticky;
       top: 10px;
       z-index: 20;
-      margin: 18px 0 10px;
-      padding: 12px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.96);
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.05);
-      backdrop-filter: blur(8px);
+      margin: var(--space-4) 0 var(--space-3);
+      padding: var(--space-3);
+      border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--color-surface-2) 92%, transparent);
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(10px);
     }
-
     .menu-sticky-nav-label {
-      font-size: 13px;
-      color: #666;
-      margin-bottom: 8px;
-      font-weight: bold;
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-2);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
     }
-
     .menu-sticky-links {
       display: flex;
-      gap: 8px;
+      gap: var(--space-2);
       overflow-x: auto;
       padding-bottom: 2px;
       scrollbar-width: thin;
     }
-
     .menu-sticky-link {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
+      min-height: 44px;
       white-space: nowrap;
-      padding: 8px 12px;
-      border-radius: 999px;
+      padding: 0.7rem 0.95rem;
+      border-radius: var(--radius-full);
       text-decoration: none;
-      background: #f3f4f6;
-      color: #1f2937;
-      border: 1px solid #e5e7eb;
-      font-size: 14px;
+      background: var(--color-surface);
+      color: var(--color-text);
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+      font-size: var(--text-sm);
     }
-
-    .menu-sticky-link:hover {
-      background: #e5e7eb;
-    }
+    .menu-sticky-link:hover { background: var(--color-surface-offset); }
 
     .menu-category {
-      margin-top: 18px;
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      background: #fff;
+      margin-top: var(--space-4);
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+      border-radius: var(--radius-xl);
+      background: var(--color-surface-2);
       overflow: hidden;
-      scroll-margin-top: 90px;
+      scroll-margin-top: 96px;
+      box-shadow: var(--shadow-sm);
+      content-visibility: auto;
     }
-
     .menu-category-header {
-      padding: 16px;
-      border-bottom: 1px solid #f0f0f0;
-      background: #fcfcfc;
+      padding: var(--space-4);
+      border-bottom: 1px solid color-mix(in srgb, var(--color-text) 8%, transparent);
+      background: color-mix(in srgb, var(--color-surface) 90%, transparent);
     }
-
     .menu-category-title {
-      font-size: 22px;
-      font-weight: bold;
-      margin-bottom: 4px;
+      font-size: var(--text-lg);
+      font-weight: 700;
+      margin-bottom: var(--space-1);
     }
-
     .menu-category-slug {
-      color: #777;
-      font-size: 13px;
+      color: var(--color-text-muted);
+      font-size: var(--text-xs);
+      text-transform: lowercase;
     }
-
     .menu-items {
-      padding: 10px 14px 14px;
+      padding: var(--space-3);
       display: grid;
-      gap: 10px;
+      gap: var(--space-3);
     }
-
     .menu-item {
-      border: 1px solid #ececec;
-      border-radius: 12px;
-      padding: 14px;
-      background: #ffffff;
+      border: 1px solid color-mix(in srgb, var(--color-text) 8%, transparent);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      background: var(--color-surface);
     }
-
-    .menu-item-top,
-    .staff-item-row {
+    .menu-item-top, .staff-item-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 14px;
+      gap: var(--space-4);
     }
-
     .menu-item-name {
-      font-size: 17px;
-      font-weight: bold;
-      margin-bottom: 4px;
+      font-size: var(--text-base);
+      font-weight: 700;
+      margin-bottom: var(--space-1);
     }
-
     .menu-item-name sup {
       font-size: 11px;
-      font-weight: normal;
-      color: #666;
+      font-weight: 500;
+      color: var(--color-text-muted);
       margin-left: 2px;
     }
-
     .menu-item-description {
-      color: #666;
-      font-size: 14px;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
       line-height: 1.45;
-      margin-top: 6px;
+      margin-top: var(--space-2);
     }
-
     .menu-item-price {
-      font-weight: bold;
+      font-weight: 700;
       white-space: nowrap;
-      color: #0f766e;
-      font-size: 16px;
+      color: var(--color-primary);
+      font-size: var(--text-base);
     }
-
     .menu-item-meta {
-      margin-top: 8px;
-      color: #888;
-      font-size: 12px;
+      margin-top: var(--space-2);
+      color: var(--color-text-faint);
+      font-size: var(--text-xs);
     }
 
     .legend-box {
-      margin-top: 24px;
-      padding: 16px;
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      background: #fffef8;
+      margin-top: var(--space-6);
+      padding: var(--space-4);
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+      border-radius: var(--radius-xl);
+      background: color-mix(in srgb, var(--color-surface) 96%, transparent);
     }
-
-    .legend-grid {
+    .legend-grid, .allergen-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 8px 18px;
-      margin-top: 12px;
+      gap: var(--space-2) var(--space-4);
+      margin-top: var(--space-3);
     }
-
     .legend-item {
-      font-size: 14px;
-      color: #444;
-    }
-
-    .allergen-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 8px 14px;
-      margin: 8px 0 14px;
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
     }
 
     .checkbox-item {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(255,255,255,0.8);
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 10px 12px;
+      gap: var(--space-2);
+      background: var(--color-surface-2);
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 0.9rem;
+      min-height: 44px;
     }
-
     .checkbox-item input[type="checkbox"] {
       width: auto;
       margin: 0;
@@ -405,123 +459,185 @@
 
     .sortable-list {
       display: grid;
-      gap: 10px;
-      margin-top: 12px;
+      gap: var(--space-3);
+      margin-top: var(--space-3);
     }
-
     .sortable-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      border: 1px solid #e5e7eb;
-      background: #fff;
-      border-radius: 12px;
-      padding: 12px;
+      gap: var(--space-3);
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+      background: var(--color-surface-2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
       touch-action: none;
     }
-
     .drag-handle {
-      width: 42px;
-      min-width: 42px;
-      height: 42px;
-      border-radius: 10px;
+      width: 44px;
+      min-width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f3f4f6;
-      color: #374151;
+      background: var(--color-surface-offset);
+      color: var(--color-text);
       cursor: grab;
       font-size: 20px;
       user-select: none;
     }
-
-    .drag-handle:active {
-      cursor: grabbing;
-    }
-
-    .sortable-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .sortable-title {
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
-
-    .sortable-subtitle {
-      font-size: 13px;
-      color: #666;
-    }
-
+    .drag-handle:active { cursor: grabbing; }
+    .sortable-content { flex: 1; min-width: 0; }
+    .sortable-title { font-weight: 700; margin-bottom: var(--space-1); }
+    .sortable-subtitle { font-size: var(--text-xs); color: var(--color-text-muted); }
     .tag {
       display: inline-block;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: #ecfeff;
-      color: #0f766e;
-      font-size: 12px;
-      margin-top: 6px;
+      padding: 0.3rem 0.55rem;
+      border-radius: var(--radius-full);
+      background: var(--color-primary-highlight);
+      color: var(--color-primary);
+      font-size: var(--text-xs);
+      margin-top: var(--space-2);
     }
-
-    .ghost {
-      opacity: 0.4;
-    }
+    .ghost { opacity: 0.45; }
 
     .staff-section {
-      margin-top: 20px;
-      padding-top: 16px;
-      border-top: 1px solid #e5e7eb;
+      margin-top: var(--space-5);
+      padding-top: var(--space-4);
+      border-top: 1px solid color-mix(in srgb, var(--color-text) 8%, transparent);
     }
-
     .staff-card {
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      background: #fff;
-      padding: 12px;
-      margin-bottom: 12px;
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface-2);
+      padding: var(--space-3);
+      margin-bottom: var(--space-3);
     }
-
-    .staff-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
     .mini-btn {
-      padding: 8px 10px;
-      font-size: 13px;
-      border-radius: 8px;
+      padding: 0.65rem 0.8rem;
+      font-size: var(--text-xs);
+      border-radius: var(--radius-md);
+      min-height: 40px;
     }
-
-    .mini-btn.secondary-btn {
-      background: #374151;
-    }
-
-    .mini-btn.danger-btn {
-      background: #b91c1c;
-    }
-
     .category-block {
-      margin-bottom: 18px;
-      padding-bottom: 8px;
-      border-bottom: 1px dashed #d1d5db;
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px dashed color-mix(in srgb, var(--color-text) 12%, transparent);
+    }
+
+    .staff-fab {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1000;
+      width: 54px;
+      height: 54px;
+      border-radius: var(--radius-full);
+      background: #374151;
+      color: #fff;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      opacity: 0.3;
+    }
+    .staff-fab:hover,
+    .staff-fab:focus-visible {
+      opacity: 0.96;
+      transform: scale(1.04);
+      background: #1f2937;
+    }
+
+    .staff-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 1001;
+      display: none;
+      backdrop-filter: blur(2px);
+    }
+    .staff-overlay.open { display: block; }
+
+    .staff-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(560px, 100%);
+      height: 100dvh;
+      background: var(--color-surface-2);
+      z-index: 1002;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.12);
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+      padding: var(--space-5);
+      border-left: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+    }
+    .staff-drawer.open { transform: translateX(0); }
+    .staff-drawer-header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      margin: calc(var(--space-5) * -1) calc(var(--space-5) * -1) var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      background: color-mix(in srgb, var(--color-surface-2) 92%, transparent);
+      border-bottom: 1px solid color-mix(in srgb, var(--color-text) 8%, transparent);
+      backdrop-filter: blur(10px);
+    }
+    .staff-drawer-title p {
+      margin: var(--space-1) 0 0;
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+    .staff-close-btn {
+      background: #374151;
+      color: #fff;
+      min-width: 44px;
+    }
+
+    @media (max-width: 640px) {
+      body { padding: var(--space-2); }
+      .shell { border-radius: var(--radius-lg); }
+      .topbar, main, .staff-drawer { padding-left: var(--space-4); padding-right: var(--space-4); }
+      .topbar { align-items: flex-start; }
+      .menu-item-top, .staff-item-row { flex-direction: column; }
+      .menu-item-price { margin-top: var(--space-1); }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Menu Millennium</h1>
-    <p class="subtitle">Menu pubblico + gestione staff</p>
+  <a class="skip-link" href="#mainContent">Vai al contenuto</a>
 
-    <div class="grid">
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand" aria-label="Menu Millennium">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 18V6M12 18V6M18 18V6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M4 18H20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">Menu Millennium</div>
+          <div class="brand-subtitle">Menu pubblico con area staff discreta</div>
+        </div>
+      </div>
+
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Cambia tema"></button>
+    </header>
+
+    <main id="mainContent">
       <section class="panel">
         <h2>Menu pubblico</h2>
-        <p class="small">Questa parte è visibile ai clienti che aprono il QR code.</p>
+        <p class="subtitle">Questa sezione è visibile ai clienti che aprono il QR code.</p>
 
         <div class="actions">
-          <button id="loadMenuBtn">Carica menu completo</button>
+          <button id="loadMenuBtn" type="button">Carica menu completo</button>
         </div>
 
         <div id="status">Stato: pronto</div>
@@ -530,146 +646,156 @@
 
         <div class="legend-box">
           <h3>Legenda</h3>
-          <p class="small">L’asterisco indica prodotto surgelato. I numeri in piccolo indicano gli allergeni presenti nel piatto. [web:442][web:449]</p>
+          <p class="small">L’asterisco indica prodotto surgelato. I numeri in piccolo indicano gli allergeni presenti nel piatto.</p>
           <div class="legend-grid" id="legendGrid"></div>
         </div>
       </section>
+    </main>
+  </div>
 
-      <section class="panel">
+  <button id="staffFab" class="staff-fab" type="button" aria-label="Apri area staff">⚙</button>
+  <div id="staffOverlay" class="staff-overlay"></div>
+
+  <aside id="staffDrawer" class="staff-drawer" aria-hidden="true">
+    <div class="staff-drawer-header">
+      <div class="staff-drawer-title">
         <h2>Area staff</h2>
-        <p class="small">Solo lo staff autenticato può modificare contenuti, eliminare elementi e ordinare categorie o piatti. [web:446][web:450]</p>
+        <p>Accesso, modifica contenuti, riordino categorie e piatti.</p>
+      </div>
+      <button id="closeStaffDrawerBtn" class="staff-close-btn" type="button">Chiudi</button>
+    </div>
 
-        <label for="email">Email staff</label>
-        <input type="email" id="email" placeholder="Email staff" />
+    <section class="panel">
+      <label for="email">Email staff</label>
+      <input type="email" id="email" placeholder="Email staff" autocomplete="username" />
 
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Password" />
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
+
+      <div class="button-row">
+        <button id="loginBtn" type="button">Accedi</button>
+        <button id="logoutBtn" class="secondary-btn" type="button">Esci</button>
+      </div>
+
+      <div id="authStatus">Stato login: verifica sessione...</div>
+
+      <div class="recovery-box">
+        <h3>Reset password</h3>
+        <p class="small">Se non ricordi la password, invia un link di recupero alla tua email.</p>
+        <button id="sendRecoveryBtn" type="button">Invia reset password</button>
+        <div id="recoveryStatus">Stato reset: pronto</div>
+      </div>
+
+      <div id="changePasswordBox" class="password-box hidden">
+        <h3>Imposta nuova password</h3>
+
+        <label for="newPassword">Nuova password</label>
+        <input type="password" id="newPassword" placeholder="Nuova password" autocomplete="new-password" />
+
+        <label for="confirmPassword">Conferma password</label>
+        <input type="password" id="confirmPassword" placeholder="Conferma password" autocomplete="new-password" />
+
+        <button id="savePasswordBtn" type="button">Salva nuova password</button>
+        <div id="passwordStatus">Stato password: pronto</div>
+      </div>
+
+      <div id="adminBox" class="admin-box hidden">
+        <h3 id="categoryFormTitle">Nuova categoria</h3>
+        <div id="categoryEditBanner" class="edit-banner hidden"></div>
+
+        <label for="categoryName">Nome categoria</label>
+        <input type="text" id="categoryName" placeholder="Es. Primi piatti" />
+
+        <label for="categoryVisible">Visibile</label>
+        <select id="categoryVisible">
+          <option value="true">Sì</option>
+          <option value="false">No</option>
+        </select>
 
         <div class="button-row">
-          <button id="loginBtn">Accedi</button>
-          <button id="logoutBtn" class="secondary-btn">Esci</button>
+          <button id="saveCategoryBtn" type="button">Salva categoria</button>
+          <button id="cancelCategoryEditBtn" class="warning-btn hidden" type="button">Annulla modifica</button>
         </div>
 
-        <div id="authStatus">Stato login: verifica sessione...</div>
+        <div id="adminStatus">Stato admin: pronto</div>
+      </div>
 
-        <div class="recovery-box">
-          <h3>Reset password</h3>
-          <p class="small">Se non ricordi la password, invia un link di recupero alla tua email.</p>
-          <button id="sendRecoveryBtn">Invia reset password</button>
-          <div id="recoveryStatus">Stato reset: pronto</div>
+      <div id="itemBox" class="item-box hidden">
+        <h3 id="itemFormTitle">Nuovo piatto</h3>
+        <div id="itemEditBanner" class="edit-banner hidden"></div>
+
+        <label for="itemCategory">Categoria</label>
+        <select id="itemCategory"></select>
+
+        <label for="itemName">Nome piatto</label>
+        <input type="text" id="itemName" placeholder="Es. Margherita" />
+
+        <label for="itemDescription">Descrizione</label>
+        <textarea id="itemDescription" placeholder="Es. Pomodoro, mozzarella, basilico"></textarea>
+
+        <label for="itemPrice">Prezzo</label>
+        <input type="number" id="itemPrice" step="0.01" min="0" placeholder="Es. 7.50" />
+
+        <label>Allergeni</label>
+        <div class="allergen-grid" id="allergenCheckboxes"></div>
+
+        <div class="checkbox-item" style="margin-bottom: 14px;">
+          <input type="checkbox" id="itemFrozen" />
+          <label for="itemFrozen" style="margin:0; font-weight:700;">Prodotto surgelato</label>
         </div>
 
-        <div id="changePasswordBox" class="password-box hidden">
-          <h3>Imposta nuova password</h3>
+        <label for="itemVisible">Visibile</label>
+        <select id="itemVisible">
+          <option value="true">Sì</option>
+          <option value="false">No</option>
+        </select>
 
-          <label for="newPassword">Nuova password</label>
-          <input type="password" id="newPassword" placeholder="Nuova password" />
-
-          <label for="confirmPassword">Conferma password</label>
-          <input type="password" id="confirmPassword" placeholder="Conferma password" />
-
-          <button id="savePasswordBtn">Salva nuova password</button>
-          <div id="passwordStatus">Stato password: pronto</div>
+        <div class="button-row">
+          <button id="saveItemBtn" type="button">Salva piatto</button>
+          <button id="cancelItemEditBtn" class="warning-btn hidden" type="button">Annulla modifica</button>
         </div>
 
-        <div id="adminBox" class="admin-box hidden">
-          <h3 id="categoryFormTitle">Nuova categoria</h3>
-          <div id="categoryEditBanner" class="edit-banner hidden"></div>
+        <div id="itemStatus">Stato piatto: pronto</div>
+      </div>
 
-          <label for="categoryName">Nome categoria</label>
-          <input type="text" id="categoryName" placeholder="Es. Primi piatti" />
+      <div id="sortBox" class="sort-box hidden">
+        <h3>Ordina categorie</h3>
+        <p class="small">Tieni premuta la maniglia e trascina. Funziona anche su touch screen.</p>
 
-          <label for="categoryVisible">Visibile</label>
-          <select id="categoryVisible">
-            <option value="true">Sì</option>
-            <option value="false">No</option>
-          </select>
+        <div id="sortableCategories" class="sortable-list"></div>
 
-          <div class="button-row">
-            <button id="saveCategoryBtn">Salva categoria</button>
-            <button id="cancelCategoryEditBtn" class="warning-btn hidden" type="button">Annulla modifica</button>
-          </div>
-
-          <div id="adminStatus">Stato admin: pronto</div>
+        <div class="button-row">
+          <button id="saveSortBtn" type="button">Salva nuovo ordine categorie</button>
+          <button id="reloadSortBtn" class="secondary-btn" type="button">Ricarica elenco categorie</button>
         </div>
 
-        <div id="itemBox" class="item-box hidden">
-          <h3 id="itemFormTitle">Nuovo piatto</h3>
-          <div id="itemEditBanner" class="edit-banner hidden"></div>
+        <div id="sortStatus">Stato ordinamento: pronto</div>
+      </div>
 
-          <label for="itemCategory">Categoria</label>
-          <select id="itemCategory"></select>
+      <div id="itemSortBox" class="sort-box hidden">
+        <h3>Ordina piatti</h3>
+        <p class="small">Scegli una categoria e trascina i piatti per cambiare l’ordine di visualizzazione.</p>
 
-          <label for="itemName">Nome piatto</label>
-          <input type="text" id="itemName" placeholder="Es. Margherita" />
+        <label for="itemSortCategory">Categoria da ordinare</label>
+        <select id="itemSortCategory"></select>
 
-          <label for="itemDescription">Descrizione</label>
-          <textarea id="itemDescription" placeholder="Es. Pomodoro, mozzarella, basilico"></textarea>
+        <div id="sortableItems" class="sortable-list"></div>
 
-          <label for="itemPrice">Prezzo</label>
-          <input type="number" id="itemPrice" step="0.01" min="0" placeholder="Es. 7.50" />
-
-          <label>Allergeni</label>
-          <div class="allergen-grid" id="allergenCheckboxes"></div>
-
-          <div class="checkbox-item" style="margin-bottom: 14px;">
-            <input type="checkbox" id="itemFrozen" />
-            <label for="itemFrozen" style="margin:0; font-weight:bold;">Prodotto surgelato</label>
-          </div>
-
-          <label for="itemVisible">Visibile</label>
-          <select id="itemVisible">
-            <option value="true">Sì</option>
-            <option value="false">No</option>
-          </select>
-
-          <div class="button-row">
-            <button id="saveItemBtn">Salva piatto</button>
-            <button id="cancelItemEditBtn" class="warning-btn hidden" type="button">Annulla modifica</button>
-          </div>
-
-          <div id="itemStatus">Stato piatto: pronto</div>
+        <div class="button-row">
+          <button id="saveItemSortBtn" type="button">Salva nuovo ordine piatti</button>
+          <button id="reloadItemSortBtn" class="secondary-btn" type="button">Ricarica elenco piatti</button>
         </div>
 
-        <div id="sortBox" class="sort-box hidden">
-          <h3>Ordina categorie</h3>
-          <p class="small">Tieni premuta la maniglia e trascina. Funziona anche su touch screen.</p>
+        <div id="itemSortStatus">Stato ordinamento piatti: pronto</div>
+      </div>
 
-          <div id="sortableCategories" class="sortable-list"></div>
-
-          <div class="button-row">
-            <button id="saveSortBtn">Salva nuovo ordine categorie</button>
-            <button id="reloadSortBtn" class="secondary-btn">Ricarica elenco categorie</button>
-          </div>
-
-          <div id="sortStatus">Stato ordinamento: pronto</div>
-        </div>
-
-        <div id="itemSortBox" class="sort-box hidden">
-          <h3>Ordina piatti</h3>
-          <p class="small">Scegli una categoria e trascina i piatti per cambiare l’ordine di visualizzazione. SortableJS supporta bene il drag touch per liste riordinabili. [web:457][cite:1]</p>
-
-          <label for="itemSortCategory">Categoria da ordinare</label>
-          <select id="itemSortCategory"></select>
-
-          <div id="sortableItems" class="sortable-list"></div>
-
-          <div class="button-row">
-            <button id="saveItemSortBtn">Salva nuovo ordine piatti</button>
-            <button id="reloadItemSortBtn" class="secondary-btn">Ricarica elenco piatti</button>
-          </div>
-
-          <div id="itemSortStatus">Stato ordinamento piatti: pronto</div>
-        </div>
-
-        <div id="staffManager" class="staff-section hidden">
-          <h3>Gestione rapida staff</h3>
-          <p class="small">I pulsanti Modifica ed Elimina sono qui dentro, non nel menu cliente.</p>
-          <div id="staffCategoriesManager"></div>
-        </div>
-      </section>
-    </div>
-  </div>
+      <div id="staffManager" class="staff-section hidden">
+        <h3>Gestione rapida staff</h3>
+        <p class="small">I pulsanti modifica ed elimina restano solo qui dentro.</p>
+        <div id="staffCategoriesManager"></div>
+      </div>
+    </section>
+  </aside>
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
   <script type="module">
@@ -757,6 +883,11 @@
 
     const staffManagerEl = document.getElementById('staffManager')
     const staffCategoriesManagerEl = document.getElementById('staffCategoriesManager')
+    const staffFabEl = document.getElementById('staffFab')
+    const staffOverlayEl = document.getElementById('staffOverlay')
+    const staffDrawerEl = document.getElementById('staffDrawer')
+    const closeStaffDrawerBtnEl = document.getElementById('closeStaffDrawerBtn')
+    const themeToggleEl = document.querySelector('[data-theme-toggle]')
 
     let sortableCategoriesInstance = null
     let sortableItemsInstance = null
@@ -766,6 +897,30 @@
     let editingItemId = null
     let isStaffAuthenticated = false
     let realtimeChannel = null
+    let currentTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+
+    function applyTheme(theme) {
+      currentTheme = theme
+      document.documentElement.setAttribute('data-theme', theme)
+      themeToggleEl.setAttribute('aria-label', theme === 'dark' ? 'Passa al tema chiaro' : 'Passa al tema scuro')
+      themeToggleEl.innerHTML = theme === 'dark'
+        ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+        : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+    }
+
+    function openStaffDrawer() {
+      staffOverlayEl.classList.add('open')
+      staffDrawerEl.classList.add('open')
+      staffDrawerEl.setAttribute('aria-hidden', 'false')
+      document.body.classList.add('staff-open')
+    }
+
+    function closeStaffDrawer() {
+      staffOverlayEl.classList.remove('open')
+      staffDrawerEl.classList.remove('open')
+      staffDrawerEl.setAttribute('aria-hidden', 'true')
+      document.body.classList.remove('staff-open')
+    }
 
     function slugify(text) {
       return text
@@ -862,7 +1017,7 @@
     function startCategoryEdit(categoryId) {
       const category = cachedCategories.find(c => c.id === categoryId)
       if (!category) return
-
+      openStaffDrawer()
       editingCategoryId = category.id
       categoryFormTitleEl.textContent = 'Modifica categoria'
       saveCategoryBtn.textContent = 'Aggiorna categoria'
@@ -878,15 +1033,11 @@
 
     function startItemEdit(itemId) {
       const allItems = cachedFullMenu.flatMap(category =>
-        (category.menu_items || []).map(item => ({
-          ...item,
-          category_name: category.name
-        }))
+        (category.menu_items || []).map(item => ({ ...item, category_name: category.name }))
       )
-
       const item = allItems.find(i => i.id === itemId)
       if (!item) return
-
+      openStaffDrawer()
       editingItemId = item.id
       itemFormTitleEl.textContent = 'Modifica piatto'
       saveItemBtn.textContent = 'Aggiorna piatto'
@@ -908,32 +1059,22 @@
     async function deleteCategory(categoryId) {
       const category = cachedFullMenu.find(c => c.id === categoryId) || cachedCategories.find(c => c.id === categoryId)
       if (!category) return
-
       const itemsCount = (category.menu_items || []).length
       const message =
         'Stai per eliminare la categoria "' + category.name + '".\n\n' +
         'ATTENZIONE: verranno eliminati anche tutti i piatti collegati a questa categoria.\n' +
         'Piatti collegati trovati: ' + itemsCount + '.\n\n' +
         'Vuoi continuare?'
-
       if (!window.confirm(message)) return
-
       adminStatusEl.className = ''
       adminStatusEl.textContent = 'Eliminazione categoria in corso...'
-
-      const { error } = await supabase
-        .from('categories')
-        .delete()
-        .eq('id', categoryId)
-
+      const { error } = await supabase.from('categories').delete().eq('id', categoryId)
       if (error) {
         adminStatusEl.className = 'error'
         adminStatusEl.textContent = 'Errore eliminazione categoria: ' + error.message
         return
       }
-
       if (editingCategoryId === categoryId) resetCategoryForm()
-
       adminStatusEl.className = 'success'
       adminStatusEl.textContent = 'Categoria eliminata con successo.'
       await refreshAllData()
@@ -943,25 +1084,16 @@
       const allItems = cachedFullMenu.flatMap(category => category.menu_items || [])
       const item = allItems.find(i => i.id === itemId)
       if (!item) return
-
       if (!window.confirm('Stai per eliminare il piatto "' + item.name + '".\n\nVuoi continuare?')) return
-
       itemStatusEl.className = ''
       itemStatusEl.textContent = 'Eliminazione piatto in corso...'
-
-      const { error } = await supabase
-        .from('menu_items')
-        .delete()
-        .eq('id', itemId)
-
+      const { error } = await supabase.from('menu_items').delete().eq('id', itemId)
       if (error) {
         itemStatusEl.className = 'error'
         itemStatusEl.textContent = 'Errore eliminazione piatto: ' + error.message
         return
       }
-
       if (editingItemId === itemId) resetItemForm()
-
       itemStatusEl.className = 'success'
       itemStatusEl.textContent = 'Piatto eliminato con successo.'
       await refreshAllData()
@@ -972,7 +1104,6 @@
         .from('categories')
         .select('id, name, slug, visible, sort_order')
         .order('sort_order', { ascending: true })
-
       if (error) throw error
       return data || []
     }
@@ -999,9 +1130,7 @@
           )
         `)
         .order('sort_order', { ascending: true })
-
       if (error) throw error
-
       return (data || []).map(category => ({
         ...category,
         menu_items: (category.menu_items || []).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
@@ -1014,23 +1143,19 @@
         itemSortCategoryEl.innerHTML = '<option value="">Nessuna categoria disponibile</option>'
         return
       }
-
       const optionsHtml = cachedCategories.map(category => `
         <option value="${category.id}">${escapeHtml(category.name)}${category.visible ? '' : ' (nascosta)'}</option>
       `).join('')
-
       itemCategoryEl.innerHTML = optionsHtml
       itemSortCategoryEl.innerHTML = optionsHtml
     }
 
     function renderStickyCategories() {
       const visibleCategories = cachedFullMenu.filter(category => category.visible)
-
       if (!visibleCategories.length) {
         stickyCategoriesEl.innerHTML = ''
         return
       }
-
       stickyCategoriesEl.innerHTML = `
         <div class="menu-sticky-nav">
           <div class="menu-sticky-nav-label">Vai alla categoria</div>
@@ -1045,25 +1170,20 @@
 
     function renderPublicMenu() {
       const visibleCategories = cachedFullMenu.filter(category => category.visible)
-
       if (!visibleCategories.length) {
         publicMenuEl.innerHTML = '<div class="empty">Nessuna categoria visibile nel menu.</div>'
         stickyCategoriesEl.innerHTML = ''
         return
       }
-
       renderStickyCategories()
-
       publicMenuEl.innerHTML = visibleCategories.map(category => {
         const visibleItems = (category.menu_items || []).filter(item => item.visible)
-
         return `
-          <div class="menu-category" id="category-${category.id}">
+          <article class="menu-category" id="category-${category.id}">
             <div class="menu-category-header">
               <div class="menu-category-title">${escapeHtml(category.name)}</div>
               <div class="menu-category-slug">${escapeHtml(category.slug)}</div>
             </div>
-
             <div class="menu-items">
               ${visibleItems.length
                 ? visibleItems.map(item => `
@@ -1080,22 +1200,19 @@
                     </div>
                   </div>
                 `).join('')
-                : '<div class="empty">Nessun piatto visibile in questa categoria.</div>'
-              }
+                : '<div class="empty">Nessun piatto visibile in questa categoria.</div>'}
             </div>
-          </div>
+          </article>
         `
       }).join('')
     }
 
     function renderSortableCategories() {
       sortableCategoriesEl.innerHTML = ''
-
       if (!cachedCategories.length) {
         sortableCategoriesEl.innerHTML = '<div class="empty">Nessuna categoria da ordinare.</div>'
         return
       }
-
       sortableCategoriesEl.innerHTML = cachedCategories.map(category => `
         <div class="sortable-item" data-id="${category.id}">
           <div class="drag-handle">☰</div>
@@ -1106,11 +1223,7 @@
           </div>
         </div>
       `).join('')
-
-      if (sortableCategoriesInstance) {
-        sortableCategoriesInstance.destroy()
-      }
-
+      if (sortableCategoriesInstance) sortableCategoriesInstance.destroy()
       sortableCategoriesInstance = Sortable.create(sortableCategoriesEl, {
         animation: 150,
         handle: '.drag-handle',
@@ -1123,20 +1236,16 @@
 
     function renderSortableItems() {
       const categoryId = itemSortCategoryEl.value
-
       if (!categoryId) {
         sortableItemsEl.innerHTML = '<div class="empty">Seleziona una categoria.</div>'
         return
       }
-
       const category = cachedFullMenu.find(c => c.id === categoryId)
       const items = category?.menu_items || []
-
       if (!items.length) {
         sortableItemsEl.innerHTML = '<div class="empty">Nessun piatto in questa categoria.</div>'
         return
       }
-
       sortableItemsEl.innerHTML = items.map(item => `
         <div class="sortable-item" data-id="${item.id}">
           <div class="drag-handle">☰</div>
@@ -1147,11 +1256,7 @@
           </div>
         </div>
       `).join('')
-
-      if (sortableItemsInstance) {
-        sortableItemsInstance.destroy()
-      }
-
+      if (sortableItemsInstance) sortableItemsInstance.destroy()
       sortableItemsInstance = Sortable.create(sortableItemsEl, {
         animation: 150,
         handle: '.drag-handle',
@@ -1167,12 +1272,10 @@
         staffCategoriesManagerEl.innerHTML = ''
         return
       }
-
       if (!cachedFullMenu.length) {
         staffCategoriesManagerEl.innerHTML = '<div class="empty">Nessun contenuto disponibile.</div>'
         return
       }
-
       staffCategoriesManagerEl.innerHTML = cachedFullMenu.map(category => `
         <div class="category-block">
           <div class="staff-card">
@@ -1187,7 +1290,6 @@
               <button type="button" class="mini-btn danger-btn staff-delete-category-btn" data-category-id="${category.id}">Elimina categoria</button>
             </div>
           </div>
-
           ${(category.menu_items || []).length
             ? category.menu_items.map(item => `
               <div class="staff-card">
@@ -1204,38 +1306,24 @@
                 </div>
               </div>
             `).join('')
-            : '<div class="empty">Nessun piatto in questa categoria.</div>'
-          }
+            : '<div class="empty">Nessun piatto in questa categoria.</div>'}
         </div>
       `).join('')
 
-      document.querySelectorAll('.staff-edit-category-btn').forEach(btn => {
-        btn.addEventListener('click', () => startCategoryEdit(btn.dataset.categoryId))
-      })
-
-      document.querySelectorAll('.staff-delete-category-btn').forEach(btn => {
-        btn.addEventListener('click', () => deleteCategory(btn.dataset.categoryId))
-      })
-
-      document.querySelectorAll('.staff-edit-item-btn').forEach(btn => {
-        btn.addEventListener('click', () => startItemEdit(btn.dataset.itemId))
-      })
-
-      document.querySelectorAll('.staff-delete-item-btn').forEach(btn => {
-        btn.addEventListener('click', () => deleteItem(btn.dataset.itemId))
-      })
+      document.querySelectorAll('.staff-edit-category-btn').forEach(btn => btn.addEventListener('click', () => startCategoryEdit(btn.dataset.categoryId)))
+      document.querySelectorAll('.staff-delete-category-btn').forEach(btn => btn.addEventListener('click', () => deleteCategory(btn.dataset.categoryId)))
+      document.querySelectorAll('.staff-edit-item-btn').forEach(btn => btn.addEventListener('click', () => startItemEdit(btn.dataset.itemId)))
+      document.querySelectorAll('.staff-delete-item-btn').forEach(btn => btn.addEventListener('click', () => deleteItem(btn.dataset.itemId)))
     }
 
     async function loadPublicMenu() {
       statusEl.className = ''
       statusEl.textContent = 'Stato: caricamento menu completo...'
-
       try {
         cachedFullMenu = await fetchFullMenu()
         renderPublicMenu()
         renderSortableItems()
         renderStaffManager()
-
         const visibleCount = cachedFullMenu.filter(category => category.visible).length
         statusEl.className = 'success'
         statusEl.textContent = 'Categorie caricate: ' + visibleCount
@@ -1248,7 +1336,6 @@
     async function refreshStaffData() {
       sortStatusEl.className = ''
       sortStatusEl.textContent = 'Stato ordinamento: caricamento elenco...'
-
       try {
         cachedCategories = await fetchCategoriesOnly()
         populateCategorySelect()
@@ -1270,7 +1357,6 @@
     async function updateAuthState() {
       const { data } = await supabase.auth.getSession()
       const session = data.session
-
       if (session && session.user) {
         isStaffAuthenticated = true
         authStatusEl.className = 'success'
@@ -1293,7 +1379,6 @@
         itemSortBoxEl.classList.add('hidden')
         staffManagerEl.classList.add('hidden')
       }
-
       renderPublicMenu()
       renderStaffManager()
     }
@@ -1301,37 +1386,30 @@
     async function login() {
       const email = emailEl.value.trim()
       const password = passwordEl.value
-
       if (!email || !password) {
         authStatusEl.className = 'error'
         authStatusEl.textContent = 'Inserisci email e password.'
         return
       }
-
       authStatusEl.className = ''
       authStatusEl.textContent = 'Accesso in corso...'
-
       const { error } = await supabase.auth.signInWithPassword({ email, password })
-
       if (error) {
         authStatusEl.className = 'error'
         authStatusEl.textContent = 'Errore login: ' + error.message
         return
       }
-
       passwordEl.value = ''
       await updateAuthState()
     }
 
     async function logout() {
       const { error } = await supabase.auth.signOut()
-
       if (error) {
         authStatusEl.className = 'error'
         authStatusEl.textContent = 'Errore logout: ' + error.message
         return
       }
-
       await updateAuthState()
       resetCategoryForm()
       resetItemForm()
@@ -1339,26 +1417,19 @@
 
     async function sendRecovery() {
       const email = emailEl.value.trim()
-
       if (!email) {
         recoveryStatusEl.className = 'error'
         recoveryStatusEl.textContent = 'Inserisci prima l’email staff.'
         return
       }
-
       recoveryStatusEl.className = ''
       recoveryStatusEl.textContent = 'Invio email di reset in corso...'
-
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: REDIRECT_TO
-      })
-
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: REDIRECT_TO })
       if (error) {
         recoveryStatusEl.className = 'error'
         recoveryStatusEl.textContent = 'Errore reset: ' + error.message
         return
       }
-
       recoveryStatusEl.className = 'success'
       recoveryStatusEl.textContent = 'Email di reset inviata. Apri il link ricevuto e torna sul sito.'
     }
@@ -1366,38 +1437,29 @@
     async function saveNewPassword() {
       const newPassword = newPasswordEl.value
       const confirmPassword = confirmPasswordEl.value
-
       if (!newPassword || !confirmPassword) {
         passwordStatusEl.className = 'error'
         passwordStatusEl.textContent = 'Compila entrambi i campi password.'
         return
       }
-
       if (newPassword !== confirmPassword) {
         passwordStatusEl.className = 'error'
         passwordStatusEl.textContent = 'Le due password non coincidono.'
         return
       }
-
       if (newPassword.length < 8) {
         passwordStatusEl.className = 'error'
         passwordStatusEl.textContent = 'Usa una password di almeno 8 caratteri.'
         return
       }
-
       passwordStatusEl.className = ''
       passwordStatusEl.textContent = 'Salvataggio nuova password in corso...'
-
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword
-      })
-
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
       if (error) {
         passwordStatusEl.className = 'error'
         passwordStatusEl.textContent = 'Errore cambio password: ' + error.message
         return
       }
-
       newPasswordEl.value = ''
       confirmPasswordEl.value = ''
       passwordStatusEl.className = 'success'
@@ -1408,62 +1470,38 @@
       const name = categoryNameEl.value.trim()
       const slug = slugify(name)
       const visible = categoryVisibleEl.value === 'true'
-
       if (!name) {
         adminStatusEl.className = 'error'
         adminStatusEl.textContent = 'Inserisci il nome della categoria.'
         return
       }
-
       if (!slug) {
         adminStatusEl.className = 'error'
         adminStatusEl.textContent = 'Nome categoria non valido per generare lo slug.'
         return
       }
-
       adminStatusEl.className = ''
-      adminStatusEl.textContent = editingCategoryId
-        ? 'Aggiornamento categoria in corso...'
-        : 'Salvataggio categoria in corso...'
-
+      adminStatusEl.textContent = editingCategoryId ? 'Aggiornamento categoria in corso...' : 'Salvataggio categoria in corso...'
       if (editingCategoryId) {
-        const { error } = await supabase
-          .from('categories')
-          .update({ name, slug, visible })
-          .eq('id', editingCategoryId)
-
+        const { error } = await supabase.from('categories').update({ name, slug, visible }).eq('id', editingCategoryId)
         if (error) {
           adminStatusEl.className = 'error'
           adminStatusEl.textContent = 'Errore aggiornamento categoria: ' + error.message
           return
         }
-
         adminStatusEl.className = 'success'
         adminStatusEl.textContent = 'Categoria aggiornata con successo.'
       } else {
-        const nextSortOrder = cachedCategories.length
-          ? Math.max(...cachedCategories.map(c => c.sort_order || 0)) + 1
-          : 1
-
-        const { error } = await supabase
-          .from('categories')
-          .insert({
-            name,
-            slug,
-            sort_order: nextSortOrder,
-            visible
-          })
-
+        const nextSortOrder = cachedCategories.length ? Math.max(...cachedCategories.map(c => c.sort_order || 0)) + 1 : 1
+        const { error } = await supabase.from('categories').insert({ name, slug, sort_order: nextSortOrder, visible })
         if (error) {
           adminStatusEl.className = 'error'
           adminStatusEl.textContent = 'Errore salvataggio categoria: ' + error.message
           return
         }
-
         adminStatusEl.className = 'success'
         adminStatusEl.textContent = 'Categoria salvata con successo.'
       }
-
       await refreshAllData()
       resetCategoryForm()
     }
@@ -1476,114 +1514,81 @@
       const visible = itemVisibleEl.value === 'true'
       const is_frozen = itemFrozenEl.checked
       const allergens = getSelectedAllergens()
-
       if (!category_id) {
         itemStatusEl.className = 'error'
         itemStatusEl.textContent = 'Seleziona una categoria.'
         return
       }
-
       if (!name) {
         itemStatusEl.className = 'error'
         itemStatusEl.textContent = 'Inserisci il nome del piatto.'
         return
       }
-
       if (Number.isNaN(price)) {
         itemStatusEl.className = 'error'
         itemStatusEl.textContent = 'Inserisci un prezzo valido.'
         return
       }
-
       itemStatusEl.className = ''
-      itemStatusEl.textContent = editingItemId
-        ? 'Aggiornamento piatto in corso...'
-        : 'Salvataggio piatto in corso...'
-
+      itemStatusEl.textContent = editingItemId ? 'Aggiornamento piatto in corso...' : 'Salvataggio piatto in corso...'
       if (editingItemId) {
-        const { error } = await supabase
-          .from('menu_items')
-          .update({
-            category_id,
-            name,
-            description: description || null,
-            price,
-            visible,
-            allergens,
-            is_frozen
-          })
-          .eq('id', editingItemId)
-
+        const { error } = await supabase.from('menu_items').update({
+          category_id,
+          name,
+          description: description || null,
+          price,
+          visible,
+          allergens,
+          is_frozen
+        }).eq('id', editingItemId)
         if (error) {
           itemStatusEl.className = 'error'
           itemStatusEl.textContent = 'Errore aggiornamento piatto: ' + error.message
           return
         }
-
         itemStatusEl.className = 'success'
         itemStatusEl.textContent = 'Piatto aggiornato con successo.'
       } else {
-        const itemsInCategory = await supabase
-          .from('menu_items')
-          .select('sort_order')
-          .eq('category_id', category_id)
-
-        const nextSortOrder = itemsInCategory.data?.length
-          ? Math.max(...itemsInCategory.data.map(i => i.sort_order || 0)) + 1
-          : 1
-
-        const { error } = await supabase
-          .from('menu_items')
-          .insert({
-            category_id,
-            name,
-            description: description || null,
-            price,
-            visible,
-            allergens,
-            is_frozen,
-            sort_order: nextSortOrder
-          })
-
+        const itemsInCategory = await supabase.from('menu_items').select('sort_order').eq('category_id', category_id)
+        const nextSortOrder = itemsInCategory.data?.length ? Math.max(...itemsInCategory.data.map(i => i.sort_order || 0)) + 1 : 1
+        const { error } = await supabase.from('menu_items').insert({
+          category_id,
+          name,
+          description: description || null,
+          price,
+          visible,
+          allergens,
+          is_frozen,
+          sort_order: nextSortOrder
+        })
         if (error) {
           itemStatusEl.className = 'error'
           itemStatusEl.textContent = 'Errore salvataggio piatto: ' + error.message
           return
         }
-
         itemStatusEl.className = 'success'
         itemStatusEl.textContent = 'Piatto salvato con successo.'
       }
-
       await refreshAllData()
       resetItemForm()
     }
 
     async function saveCategoryOrder() {
       const items = [...sortableCategoriesEl.querySelectorAll('.sortable-item')]
-
       if (!items.length) {
         sortStatusEl.className = 'error'
         sortStatusEl.textContent = 'Nessuna categoria da ordinare.'
         return
       }
-
       sortStatusEl.className = ''
       sortStatusEl.textContent = 'Salvataggio nuovo ordine categorie in corso...'
-
       try {
         for (let i = 0; i < items.length; i++) {
           const id = items[i].dataset.id
           const newOrder = i + 1
-
-          const { error } = await supabase
-            .from('categories')
-            .update({ sort_order: newOrder })
-            .eq('id', id)
-
+          const { error } = await supabase.from('categories').update({ sort_order: newOrder }).eq('id', id)
           if (error) throw error
         }
-
         sortStatusEl.className = 'success'
         sortStatusEl.textContent = 'Nuovo ordine categorie salvato con successo.'
         await refreshAllData()
@@ -1596,35 +1601,25 @@
     async function saveItemOrder() {
       const categoryId = itemSortCategoryEl.value
       const items = [...sortableItemsEl.querySelectorAll('.sortable-item')]
-
       if (!categoryId) {
         itemSortStatusEl.className = 'error'
         itemSortStatusEl.textContent = 'Seleziona una categoria.'
         return
       }
-
       if (!items.length) {
         itemSortStatusEl.className = 'error'
         itemSortStatusEl.textContent = 'Nessun piatto da ordinare.'
         return
       }
-
       itemSortStatusEl.className = ''
       itemSortStatusEl.textContent = 'Salvataggio nuovo ordine piatti in corso...'
-
       try {
         for (let i = 0; i < items.length; i++) {
           const id = items[i].dataset.id
           const newOrder = i + 1
-
-          const { error } = await supabase
-            .from('menu_items')
-            .update({ sort_order: newOrder })
-            .eq('id', id)
-
+          const { error } = await supabase.from('menu_items').update({ sort_order: newOrder }).eq('id', id)
           if (error) throw error
         }
-
         itemSortStatusEl.className = 'success'
         itemSortStatusEl.textContent = 'Nuovo ordine piatti salvato con successo.'
         await refreshAllData()
@@ -1638,21 +1633,12 @@
       if (realtimeChannel) {
         supabase.removeChannel(realtimeChannel)
       }
-
       realtimeChannel = supabase
         .channel('menu-realtime')
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'categories'
-        }, async () => {
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, async () => {
           await refreshAllData()
         })
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'menu_items'
-        }, async () => {
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, async () => {
           await refreshAllData()
         })
         .subscribe()
@@ -1672,9 +1658,18 @@
     cancelCategoryEditBtn.addEventListener('click', resetCategoryForm)
     cancelItemEditBtn.addEventListener('click', resetItemForm)
     itemSortCategoryEl.addEventListener('change', renderSortableItems)
+    staffFabEl.addEventListener('click', openStaffDrawer)
+    closeStaffDrawerBtnEl.addEventListener('click', closeStaffDrawer)
+    staffOverlayEl.addEventListener('click', closeStaffDrawer)
+    themeToggleEl.addEventListener('click', () => applyTheme(currentTheme === 'dark' ? 'light' : 'dark'))
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeStaffDrawer()
+    })
 
     renderAllergenCheckboxes()
     renderLegend()
+    applyTheme(currentTheme)
     await refreshAllData()
     await updateAuthState()
     subscribeRealtime()
