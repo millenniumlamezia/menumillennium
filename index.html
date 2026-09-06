@@ -767,6 +767,47 @@
         </div>
       </div>
 
+      <div id="printAccordion" class="accordion-item hidden" data-staff-section="print-menu">
+  <button class="accordion-trigger" type="button" data-accordion-trigger>
+    <div class="accordion-trigger-left">
+      <div class="accordion-title">Stampa menu</div>
+      <div class="accordion-subtitle">
+        Seleziona le categorie e stampa o salva il menu in PDF.
+      </div>
+    </div>
+
+    <div class="accordion-icon">+</div>
+  </button>
+
+  <div class="accordion-content">
+    <p class="small">
+      Seleziona le categorie da includere nella stampa.
+    </p>
+
+    <div class="button-row">
+      <button id="selectAllPrintCategoriesBtn" class="secondary-btn" type="button">
+        Seleziona tutte
+      </button>
+
+      <button id="clearAllPrintCategoriesBtn" class="warning-btn" type="button">
+        Deseleziona tutte
+      </button>
+    </div>
+
+    <div id="printCategoriesList" class="print-grid"></div>
+
+    <div class="button-row">
+      <button id="printMenuBtn" type="button">
+        Stampa / Salva PDF
+      </button>
+    </div>
+
+    <div id="printStatus">
+      Stato stampa: pronto
+    </div>
+  </div>
+</div>
+      
       <div id="staffManagerAccordion" class="accordion-item hidden" data-staff-section="staff-manager">
         <button class="accordion-trigger" type="button" data-accordion-trigger>
           <div class="accordion-trigger-left">
@@ -825,6 +866,12 @@
     const sortAccordionEl = document.getElementById('sortAccordion')
     const itemSortAccordionEl = document.getElementById('itemSortAccordion')
     const staffManagerAccordionEl = document.getElementById('staffManagerAccordion')
+    const printAccordionEl = document.getElementById('printAccordion')
+    const printCategoriesListEl = document.getElementById('printCategoriesList')
+    const selectAllPrintCategoriesBtn = document.getElementById('selectAllPrintCategoriesBtn')
+    const clearAllPrintCategoriesBtn = document.getElementById('clearAllPrintCategoriesBtn')
+    const printMenuBtn = document.getElementById('printMenuBtn')
+    const printStatusEl = document.getElementById('printStatus')
 
     const adminStatusEl = document.getElementById('adminStatus')
     const categoryNameEl = document.getElementById('categoryName')
@@ -998,24 +1045,26 @@
     }
 
     function closeAllStaffAccordions() {
-      ;[
-        categoryAccordionEl,
-        itemAccordionEl,
-        sortAccordionEl,
-        itemSortAccordionEl,
-        staffManagerAccordionEl
-      ].forEach(item => item && closeAccordionItem(item))
-    }
+  [
+    categoryAccordionEl,
+    itemAccordionEl,
+    sortAccordionEl,
+    itemSortAccordionEl,
+    printAccordionEl,
+    staffManagerAccordionEl
+  ].forEach(item => item && closeAccordionItem(item))
+}
 
     function showStaffAreas(show) {
-      ;[
-        categoryAccordionEl,
-        itemAccordionEl,
-        sortAccordionEl,
-        itemSortAccordionEl,
-        staffManagerAccordionEl
-      ].forEach(el => el.classList.toggle('hidden', !show))
-    }
+  [
+    categoryAccordionEl,
+    itemAccordionEl,
+    sortAccordionEl,
+    itemSortAccordionEl,
+    printAccordionEl,
+    staffManagerAccordionEl
+  ].forEach(el => el.classList.toggle('hidden', !show))
+}
 
     function resetCategoryForm() {
       editingCategoryId = null
@@ -1790,6 +1839,23 @@
         .subscribe()
     }
 
+    selectAllPrintCategoriesBtn.addEventListener('click', () => {
+  document
+    .querySelectorAll('.print-category-checkbox')
+    .forEach(checkbox => {
+      checkbox.checked = true
+    })
+})
+
+clearAllPrintCategoriesBtn.addEventListener('click', () => {
+  document
+    .querySelectorAll('.print-category-checkbox')
+    .forEach(checkbox => {
+      checkbox.checked = false
+    })
+})
+
+printMenuBtn.addEventListener('click', printSelectedMenu)
     loginBtn.addEventListener('click', login)
     logoutBtn.addEventListener('click', logout)
     saveCategoryBtn.addEventListener('click', saveCategory)
