@@ -1,12 +1,169 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Menu Millennium</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      margin-top: 0;
+      color: #666;
+    }
+
+    .actions {
+      margin: 24px 0 16px 0;
+    }
+
+    button {
+      background: #0f766e;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #115e59;
+    }
+
+    #status {
+      margin: 16px 0;
+      padding: 12px 14px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+    }
+
+    #categories {
+      margin-top: 24px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .category-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafa;
+    }
+
+    .category-name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .category-meta {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .empty {
+      padding: 16px;
+      border: 1px dashed #ccc;
+      border-radius: 12px;
+      background: #fafafa;
+      color: #555;
+    }
+
+    .success {
+      color: #166534;
+    }
+
+    .error {
+      color: #991b1b;
+    }
+  </style>
 </head>
 <body>
-  <h1>Menu Millennium</h1>
-  <p>Sito in preparazione.</p>
+  <div class="container">
+    <h1>Menu Millennium</h1>
+    <p class="subtitle">Test collegamento GitHub Pages + Supabase</p>
+
+    <div class="actions">
+      <button id="loadCategoriesBtn">Carica categorie</button>
+    </div>
+
+    <div id="status">Stato: pronto</div>
+
+    <div id="categories"></div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    const SUPABASE_URL = 'https://kkdqegeqljxllrjhkfpb.supabase.co'
+    const SUPABASE_KEY = 'sb_publishable_fwhO7nTMTiUJd991F1e6tw_xR99S7Ln'
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+    const statusEl = document.getElementById('status')
+    const categoriesEl = document.getElementById('categories')
+    const loadBtn = document.getElementById('loadCategoriesBtn')
+
+    async function loadCategories() {
+      statusEl.className = ''
+      statusEl.textContent = 'Stato: caricamento categorie...'
+      categoriesEl.innerHTML = ''
+
+      const { data, error } = await supabase
+        .from('categories')
+        .select('id, name, slug, visible, sort_order')
+        .order('sort_order', { ascending: true })
+
+      if (error) {
+        statusEl.className = 'error'
+        statusEl.textContent = 'Errore: ' + error.message
+        return
+      }
+
+      statusEl.className = 'success'
+      statusEl.textContent = 'Categorie caricate: ' + data.length
+
+      if (!data || data.length === 0) {
+        categoriesEl.innerHTML = '<div class="empty">Nessuna categoria presente nel database.</div>'
+        return
+      }
+
+      categoriesEl.innerHTML = data.map(category => `
+        <div class="category-card">
+          <div class="category-name">${category.name}</div>
+          <div class="category-meta">Slug: ${category.slug}</div>
+          <div class="category-meta">Visibile: ${category.visible ? 'Sì' : 'No'}</div>
+          <div class="category-meta">Ordine: ${category.sort_order}</div>
+        </div>
+      `).join('')
+    }
+
+    loadBtn.addEventListener('click', loadCategories)
+  </script>
 </body>
 </html>
