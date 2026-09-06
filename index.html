@@ -16,7 +16,7 @@
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
       background: #ffffff;
       border-radius: 14px;
@@ -24,10 +24,10 @@
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     }
 
-    h1, h2, h3 { margin-top: 0; }
+    h1, h2, h3, h4 { margin-top: 0; }
 
-    .subtitle {
-      margin-top: 0;
+    .subtitle,
+    .small {
       color: #666;
     }
 
@@ -37,7 +37,7 @@
       gap: 24px;
     }
 
-    @media (min-width: 980px) {
+    @media (min-width: 1100px) {
       .grid {
         grid-template-columns: 1.05fr 0.95fr;
       }
@@ -50,11 +50,11 @@
       background: #fafafa;
     }
 
-    input, select, button {
+    input, select, textarea, button {
       font: inherit;
     }
 
-    input, select {
+    input, select, textarea {
       width: 100%;
       padding: 12px;
       margin-bottom: 12px;
@@ -62,6 +62,11 @@
       border-radius: 10px;
       background: #fff;
       font-size: 16px;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
     }
 
     label {
@@ -93,8 +98,17 @@
       background: #1f2937;
     }
 
+    .warning-btn {
+      background: #b45309;
+    }
+
+    .warning-btn:hover {
+      background: #92400e;
+    }
+
     .actions,
-    .button-row {
+    .button-row,
+    .inline-actions {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
@@ -104,6 +118,7 @@
     #status,
     #authStatus,
     #adminStatus,
+    #itemStatus,
     #passwordStatus,
     #recoveryStatus,
     #sortStatus {
@@ -128,6 +143,11 @@
       border: 1px solid #fed7aa;
     }
 
+    #itemStatus {
+      background: #fefce8;
+      border: 1px solid #fde68a;
+    }
+
     #passwordStatus,
     #recoveryStatus,
     #sortStatus {
@@ -135,37 +155,8 @@
       border: 1px solid #ddd6fe;
     }
 
-    #categories {
-      margin-top: 24px;
-      display: grid;
-      gap: 12px;
-    }
-
-    .category-card {
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 16px;
-      background: #ffffff;
-    }
-
-    .category-name {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-
-    .category-meta,
-    .small {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .empty {
-      padding: 16px;
-      border: 1px dashed #ccc;
-      border-radius: 12px;
-      background: #fafafa;
-      color: #555;
+    .hidden {
+      display: none;
     }
 
     .success {
@@ -176,14 +167,19 @@
       color: #991b1b;
     }
 
-    .hidden {
-      display: none;
+    .empty {
+      padding: 16px;
+      border: 1px dashed #ccc;
+      border-radius: 12px;
+      background: #fafafa;
+      color: #555;
     }
 
     .admin-box,
     .password-box,
     .recovery-box,
-    .sort-box {
+    .sort-box,
+    .item-box {
       margin-top: 16px;
       padding: 14px;
       border-radius: 12px;
@@ -192,6 +188,11 @@
     .admin-box {
       background: #ecfeff;
       border: 1px solid #a5f3fc;
+    }
+
+    .item-box {
+      background: #fefce8;
+      border: 1px solid #fde68a;
     }
 
     .password-box {
@@ -207,6 +208,113 @@
     .sort-box {
       background: #fffaf0;
       border: 1px solid #fde68a;
+    }
+
+    .edit-banner {
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.08);
+      color: #444;
+      font-size: 14px;
+    }
+
+    .menu-category {
+      margin-top: 18px;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .menu-category-header {
+      padding: 16px;
+      border-bottom: 1px solid #f0f0f0;
+      background: #fcfcfc;
+    }
+
+    .menu-category-title-row,
+    .menu-item-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .menu-category-title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .menu-category-slug {
+      color: #777;
+      font-size: 13px;
+    }
+
+    .menu-category-header-actions,
+    .menu-item-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mini-btn {
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 8px;
+      background: #0f766e;
+    }
+
+    .mini-btn.secondary-btn {
+      background: #374151;
+    }
+
+    .menu-items {
+      padding: 10px 14px 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .menu-item {
+      border: 1px solid #ececec;
+      border-radius: 12px;
+      padding: 14px;
+      background: #ffffff;
+    }
+
+    .menu-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .menu-item-name {
+      font-size: 17px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .menu-item-description {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.45;
+      margin-top: 6px;
+    }
+
+    .menu-item-price {
+      font-weight: bold;
+      white-space: nowrap;
+      color: #0f766e;
+      font-size: 16px;
+    }
+
+    .menu-item-meta {
+      margin-top: 8px;
+      color: #888;
+      font-size: 12px;
     }
 
     .sortable-list {
@@ -286,11 +394,11 @@
         <p class="small">Questa parte è visibile ai clienti che aprono il QR code.</p>
 
         <div class="actions">
-          <button id="loadCategoriesBtn">Carica categorie</button>
+          <button id="loadMenuBtn">Carica menu completo</button>
         </div>
 
         <div id="status">Stato: pronto</div>
-        <div id="categories"></div>
+        <div id="publicMenu"></div>
       </section>
 
       <section class="panel">
@@ -319,7 +427,6 @@
 
         <div id="changePasswordBox" class="password-box hidden">
           <h3>Imposta nuova password</h3>
-          <p class="small">Usa questo box quando sei autenticato tramite link email o login normale.</p>
 
           <label for="newPassword">Nuova password</label>
           <input type="password" id="newPassword" placeholder="Nuova password" />
@@ -332,7 +439,8 @@
         </div>
 
         <div id="adminBox" class="admin-box hidden">
-          <h3>Nuova categoria</h3>
+          <h3 id="categoryFormTitle">Nuova categoria</h3>
+          <div id="categoryEditBanner" class="edit-banner hidden"></div>
 
           <label for="categoryName">Nome categoria</label>
           <input type="text" id="categoryName" placeholder="Es. Primi piatti" />
@@ -343,8 +451,42 @@
             <option value="false">No</option>
           </select>
 
-          <button id="saveCategoryBtn">Salva categoria</button>
+          <div class="button-row">
+            <button id="saveCategoryBtn">Salva categoria</button>
+            <button id="cancelCategoryEditBtn" class="warning-btn hidden" type="button">Annulla modifica</button>
+          </div>
+
           <div id="adminStatus">Stato admin: pronto</div>
+        </div>
+
+        <div id="itemBox" class="item-box hidden">
+          <h3 id="itemFormTitle">Nuovo piatto</h3>
+          <div id="itemEditBanner" class="edit-banner hidden"></div>
+
+          <label for="itemCategory">Categoria</label>
+          <select id="itemCategory"></select>
+
+          <label for="itemName">Nome piatto</label>
+          <input type="text" id="itemName" placeholder="Es. Margherita" />
+
+          <label for="itemDescription">Descrizione</label>
+          <textarea id="itemDescription" placeholder="Es. Pomodoro, mozzarella, basilico"></textarea>
+
+          <label for="itemPrice">Prezzo</label>
+          <input type="number" id="itemPrice" step="0.01" min="0" placeholder="Es. 7.50" />
+
+          <label for="itemVisible">Visibile</label>
+          <select id="itemVisible">
+            <option value="true">Sì</option>
+            <option value="false">No</option>
+          </select>
+
+          <div class="button-row">
+            <button id="saveItemBtn">Salva piatto</button>
+            <button id="cancelItemEditBtn" class="warning-btn hidden" type="button">Annulla modifica</button>
+          </div>
+
+          <div id="itemStatus">Stato piatto: pronto</div>
         </div>
 
         <div id="sortBox" class="sort-box hidden">
@@ -375,8 +517,8 @@
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
     const statusEl = document.getElementById('status')
-    const categoriesEl = document.getElementById('categories')
-    const loadBtn = document.getElementById('loadCategoriesBtn')
+    const publicMenuEl = document.getElementById('publicMenu')
+    const loadMenuBtn = document.getElementById('loadMenuBtn')
 
     const emailEl = document.getElementById('email')
     const passwordEl = document.getElementById('password')
@@ -398,6 +540,21 @@
     const categoryNameEl = document.getElementById('categoryName')
     const categoryVisibleEl = document.getElementById('categoryVisible')
     const saveCategoryBtn = document.getElementById('saveCategoryBtn')
+    const cancelCategoryEditBtn = document.getElementById('cancelCategoryEditBtn')
+    const categoryFormTitleEl = document.getElementById('categoryFormTitle')
+    const categoryEditBannerEl = document.getElementById('categoryEditBanner')
+
+    const itemBoxEl = document.getElementById('itemBox')
+    const itemStatusEl = document.getElementById('itemStatus')
+    const itemCategoryEl = document.getElementById('itemCategory')
+    const itemNameEl = document.getElementById('itemName')
+    const itemDescriptionEl = document.getElementById('itemDescription')
+    const itemPriceEl = document.getElementById('itemPrice')
+    const itemVisibleEl = document.getElementById('itemVisible')
+    const saveItemBtn = document.getElementById('saveItemBtn')
+    const cancelItemEditBtn = document.getElementById('cancelItemEditBtn')
+    const itemFormTitleEl = document.getElementById('itemFormTitle')
+    const itemEditBannerEl = document.getElementById('itemEditBanner')
 
     const sortBoxEl = document.getElementById('sortBox')
     const sortableCategoriesEl = document.getElementById('sortableCategories')
@@ -407,6 +564,9 @@
 
     let sortableInstance = null
     let cachedCategories = []
+    let cachedFullMenu = []
+    let editingCategoryId = null
+    let editingItemId = null
 
     function slugify(text) {
       return text
@@ -421,7 +581,93 @@
         .replace(/^-+|-+$/g, '')
     }
 
-    async function fetchCategories() {
+    function formatPrice(value) {
+      return Number(value).toFixed(2).replace('.', ',') + ' €'
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+    }
+
+    function resetCategoryForm() {
+      editingCategoryId = null
+      categoryFormTitleEl.textContent = 'Nuova categoria'
+      saveCategoryBtn.textContent = 'Salva categoria'
+      cancelCategoryEditBtn.classList.add('hidden')
+      categoryEditBannerEl.classList.add('hidden')
+      categoryEditBannerEl.textContent = ''
+      categoryNameEl.value = ''
+      categoryVisibleEl.value = 'true'
+      adminStatusEl.className = ''
+      adminStatusEl.textContent = 'Stato admin: pronto'
+    }
+
+    function resetItemForm() {
+      editingItemId = null
+      itemFormTitleEl.textContent = 'Nuovo piatto'
+      saveItemBtn.textContent = 'Salva piatto'
+      cancelItemEditBtn.classList.add('hidden')
+      itemEditBannerEl.classList.add('hidden')
+      itemEditBannerEl.textContent = ''
+      itemCategoryEl.value = itemCategoryEl.options[0]?.value || ''
+      itemNameEl.value = ''
+      itemDescriptionEl.value = ''
+      itemPriceEl.value = ''
+      itemVisibleEl.value = 'true'
+      itemStatusEl.className = ''
+      itemStatusEl.textContent = 'Stato piatto: pronto'
+    }
+
+    function startCategoryEdit(categoryId) {
+      const category = cachedCategories.find(c => c.id === categoryId)
+      if (!category) return
+
+      editingCategoryId = category.id
+      categoryFormTitleEl.textContent = 'Modifica categoria'
+      saveCategoryBtn.textContent = 'Aggiorna categoria'
+      cancelCategoryEditBtn.classList.remove('hidden')
+      categoryEditBannerEl.classList.remove('hidden')
+      categoryEditBannerEl.textContent = 'Stai modificando la categoria: ' + category.name
+      categoryNameEl.value = category.name || ''
+      categoryVisibleEl.value = category.visible ? 'true' : 'false'
+      adminStatusEl.className = ''
+      adminStatusEl.textContent = 'Stato admin: modifica attiva'
+      categoryNameEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    function startItemEdit(itemId) {
+      const allItems = cachedFullMenu.flatMap(category =>
+        (category.menu_items || []).map(item => ({
+          ...item,
+          category_name: category.name
+        }))
+      )
+
+      const item = allItems.find(i => i.id === itemId)
+      if (!item) return
+
+      editingItemId = item.id
+      itemFormTitleEl.textContent = 'Modifica piatto'
+      saveItemBtn.textContent = 'Aggiorna piatto'
+      cancelItemEditBtn.classList.remove('hidden')
+      itemEditBannerEl.classList.remove('hidden')
+      itemEditBannerEl.textContent = 'Stai modificando il piatto: ' + item.name + ' (' + item.category_name + ')'
+      itemCategoryEl.value = item.category_id || ''
+      itemNameEl.value = item.name || ''
+      itemDescriptionEl.value = item.description || ''
+      itemPriceEl.value = item.price ?? ''
+      itemVisibleEl.value = item.visible ? 'true' : 'false'
+      itemStatusEl.className = ''
+      itemStatusEl.textContent = 'Stato piatto: modifica attiva'
+      itemNameEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    async function fetchCategoriesOnly() {
       const { data, error } = await supabase
         .from('categories')
         .select('id, name, slug, visible, sort_order')
@@ -431,35 +677,106 @@
       return data || []
     }
 
-    async function loadCategories() {
-      statusEl.className = ''
-      statusEl.textContent = 'Stato: caricamento categorie...'
-      categoriesEl.innerHTML = ''
+    async function fetchFullMenu() {
+      const { data, error } = await supabase
+        .from('categories')
+        .select(`
+          id,
+          name,
+          slug,
+          visible,
+          sort_order,
+          menu_items (
+            id,
+            category_id,
+            name,
+            description,
+            price,
+            visible,
+            sort_order
+          )
+        `)
+        .order('sort_order', { ascending: true })
 
-      try {
-        const data = await fetchCategories()
-        cachedCategories = data
+      if (error) throw error
 
-        statusEl.className = 'success'
-        statusEl.textContent = 'Categorie caricate: ' + data.length
+      return (data || []).map(category => ({
+        ...category,
+        menu_items: (category.menu_items || []).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+      }))
+    }
 
-        if (!data.length) {
-          categoriesEl.innerHTML = '<div class="empty">Nessuna categoria presente nel database.</div>'
-          return
-        }
+    function populateCategorySelect() {
+      const availableCategories = cachedCategories
 
-        categoriesEl.innerHTML = data.map(category => `
-          <div class="category-card">
-            <div class="category-name">${category.name}</div>
-            <div class="category-meta">Slug: ${category.slug}</div>
-            <div class="category-meta">Visibile: ${category.visible ? 'Sì' : 'No'}</div>
-            <div class="category-meta">Ordine: ${category.sort_order}</div>
-          </div>
-        `).join('')
-      } catch (error) {
-        statusEl.className = 'error'
-        statusEl.textContent = 'Errore: ' + error.message
+      if (!availableCategories.length) {
+        itemCategoryEl.innerHTML = '<option value="">Nessuna categoria disponibile</option>'
+        return
       }
+
+      itemCategoryEl.innerHTML = availableCategories.map(category => `
+        <option value="${category.id}">${escapeHtml(category.name)}${category.visible ? '' : ' (nascosta)'}</option>
+      `).join('')
+    }
+
+    function renderPublicMenu() {
+      const visibleCategories = cachedFullMenu.filter(category => category.visible)
+
+      if (!visibleCategories.length) {
+        publicMenuEl.innerHTML = '<div class="empty">Nessuna categoria visibile nel menu.</div>'
+        return
+      }
+
+      publicMenuEl.innerHTML = visibleCategories.map(category => {
+        const visibleItems = (category.menu_items || []).filter(item => item.visible)
+
+        return `
+          <div class="menu-category">
+            <div class="menu-category-header">
+              <div class="menu-category-title-row">
+                <div>
+                  <div class="menu-category-title">${escapeHtml(category.name)}</div>
+                  <div class="menu-category-slug">${escapeHtml(category.slug)}</div>
+                </div>
+                <div class="menu-category-header-actions">
+                  <button class="mini-btn edit-category-btn" data-category-id="${category.id}" type="button">Modifica</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="menu-items">
+              ${visibleItems.length
+                ? visibleItems.map(item => `
+                  <div class="menu-item">
+                    <div class="menu-item-top">
+                      <div style="flex:1">
+                        <div class="menu-item-title-row">
+                          <div class="menu-item-name">${escapeHtml(item.name)}</div>
+                          <div class="menu-item-actions">
+                            <button class="mini-btn secondary-btn edit-item-btn" data-item-id="${item.id}" type="button">Modifica</button>
+                          </div>
+                        </div>
+                        ${item.description ? `<div class="menu-item-description">${escapeHtml(item.description)}</div>` : ''}
+                        <div class="menu-item-meta">Ordine: ${item.sort_order ?? '-'}</div>
+                      </div>
+                      <div class="menu-item-price">${formatPrice(item.price)}</div>
+                    </div>
+                  </div>
+                `).join('')
+                : '<div class="empty">Nessun piatto visibile in questa categoria.</div>'
+              }
+            </div>
+          </div>
+        `
+      }).join('')
+
+      document.querySelectorAll('.edit-category-btn').forEach(btn => {
+        btn.addEventListener('click', () => startCategoryEdit(btn.dataset.categoryId))
+      })
+
+      document.querySelectorAll('.edit-item-btn').forEach(btn => {
+        btn.addEventListener('click', () => startItemEdit(btn.dataset.itemId))
+      })
     }
 
     function renderSortableCategories() {
@@ -474,8 +791,8 @@
         <div class="sortable-item" data-id="${category.id}">
           <div class="drag-handle">☰</div>
           <div class="sortable-content">
-            <div class="sortable-title">${category.name}</div>
-            <div class="sortable-subtitle">Slug: ${category.slug}</div>
+            <div class="sortable-title">${escapeHtml(category.name)}</div>
+            <div class="sortable-subtitle">Slug: ${escapeHtml(category.slug)}</div>
             <div class="tag">${category.visible ? 'Visibile' : 'Nascosta'}</div>
           </div>
         </div>
@@ -495,12 +812,30 @@
       })
     }
 
-    async function refreshSortableList() {
+    async function loadPublicMenu() {
+      statusEl.className = ''
+      statusEl.textContent = 'Stato: caricamento menu completo...'
+
+      try {
+        cachedFullMenu = await fetchFullMenu()
+        renderPublicMenu()
+
+        const visibleCount = cachedFullMenu.filter(category => category.visible).length
+        statusEl.className = 'success'
+        statusEl.textContent = 'Categorie caricate: ' + visibleCount
+      } catch (error) {
+        statusEl.className = 'error'
+        statusEl.textContent = 'Errore: ' + error.message
+      }
+    }
+
+    async function refreshStaffData() {
       sortStatusEl.className = ''
       sortStatusEl.textContent = 'Stato ordinamento: caricamento elenco...'
 
       try {
-        cachedCategories = await fetchCategories()
+        cachedCategories = await fetchCategoriesOnly()
+        populateCategorySelect()
         renderSortableCategories()
         sortStatusEl.className = 'success'
         sortStatusEl.textContent = 'Elenco ordinabile aggiornato.'
@@ -518,13 +853,15 @@
         authStatusEl.className = 'success'
         authStatusEl.textContent = 'Stato login: autenticato come ' + session.user.email
         adminBoxEl.classList.remove('hidden')
+        itemBoxEl.classList.remove('hidden')
         changePasswordBoxEl.classList.remove('hidden')
         sortBoxEl.classList.remove('hidden')
-        await refreshSortableList()
+        await refreshStaffData()
       } else {
         authStatusEl.className = ''
         authStatusEl.textContent = 'Stato login: non autenticato'
         adminBoxEl.classList.add('hidden')
+        itemBoxEl.classList.add('hidden')
         changePasswordBoxEl.classList.add('hidden')
         sortBoxEl.classList.add('hidden')
       }
@@ -553,6 +890,20 @@
 
       passwordEl.value = ''
       await updateAuthState()
+    }
+
+    async function logout() {
+      const { error } = await supabase.auth.signOut()
+
+      if (error) {
+        authStatusEl.className = 'error'
+        authStatusEl.textContent = 'Errore logout: ' + error.message
+        return
+      }
+
+      await updateAuthState()
+      resetCategoryForm()
+      resetItemForm()
     }
 
     async function sendRecovery() {
@@ -618,7 +969,6 @@
 
       newPasswordEl.value = ''
       confirmPasswordEl.value = ''
-
       passwordStatusEl.className = 'success'
       passwordStatusEl.textContent = 'Password aggiornata con successo.'
     }
@@ -627,9 +977,6 @@
       const name = categoryNameEl.value.trim()
       const slug = slugify(name)
       const visible = categoryVisibleEl.value === 'true'
-      const nextSortOrder = cachedCategories.length
-        ? Math.max(...cachedCategories.map(c => c.sort_order || 0)) + 1
-        : 1
 
       if (!name) {
         adminStatusEl.className = 'error'
@@ -644,31 +991,136 @@
       }
 
       adminStatusEl.className = ''
-      adminStatusEl.textContent = 'Salvataggio categoria in corso...'
+      adminStatusEl.textContent = editingCategoryId
+        ? 'Aggiornamento categoria in corso...'
+        : 'Salvataggio categoria in corso...'
 
-      const { error } = await supabase
-        .from('categories')
-        .insert({
-          name,
-          slug,
-          sort_order: nextSortOrder,
-          visible
-        })
+      if (editingCategoryId) {
+        const { error } = await supabase
+          .from('categories')
+          .update({ name, slug, visible })
+          .eq('id', editingCategoryId)
 
-      if (error) {
-        adminStatusEl.className = 'error'
-        adminStatusEl.textContent = 'Errore salvataggio: ' + error.message
+        if (error) {
+          adminStatusEl.className = 'error'
+          adminStatusEl.textContent = 'Errore aggiornamento categoria: ' + error.message
+          return
+        }
+
+        adminStatusEl.className = 'success'
+        adminStatusEl.textContent = 'Categoria aggiornata con successo.'
+      } else {
+        const nextSortOrder = cachedCategories.length
+          ? Math.max(...cachedCategories.map(c => c.sort_order || 0)) + 1
+          : 1
+
+        const { error } = await supabase
+          .from('categories')
+          .insert({
+            name,
+            slug,
+            sort_order: nextSortOrder,
+            visible
+          })
+
+        if (error) {
+          adminStatusEl.className = 'error'
+          adminStatusEl.textContent = 'Errore salvataggio categoria: ' + error.message
+          return
+        }
+
+        adminStatusEl.className = 'success'
+        adminStatusEl.textContent = 'Categoria salvata con successo.'
+      }
+
+      await refreshStaffData()
+      await loadPublicMenu()
+      resetCategoryForm()
+    }
+
+    async function saveItem() {
+      const category_id = itemCategoryEl.value
+      const name = itemNameEl.value.trim()
+      const description = itemDescriptionEl.value.trim()
+      const price = Number(itemPriceEl.value)
+      const visible = itemVisibleEl.value === 'true'
+
+      if (!category_id) {
+        itemStatusEl.className = 'error'
+        itemStatusEl.textContent = 'Seleziona una categoria.'
         return
       }
 
-      adminStatusEl.className = 'success'
-      adminStatusEl.textContent = 'Categoria salvata con successo.'
+      if (!name) {
+        itemStatusEl.className = 'error'
+        itemStatusEl.textContent = 'Inserisci il nome del piatto.'
+        return
+      }
 
-      categoryNameEl.value = ''
-      categoryVisibleEl.value = 'true'
+      if (Number.isNaN(price)) {
+        itemStatusEl.className = 'error'
+        itemStatusEl.textContent = 'Inserisci un prezzo valido.'
+        return
+      }
 
-      await loadCategories()
-      await refreshSortableList()
+      itemStatusEl.className = ''
+      itemStatusEl.textContent = editingItemId
+        ? 'Aggiornamento piatto in corso...'
+        : 'Salvataggio piatto in corso...'
+
+      if (editingItemId) {
+        const { error } = await supabase
+          .from('menu_items')
+          .update({
+            category_id,
+            name,
+            description: description || null,
+            price,
+            visible
+          })
+          .eq('id', editingItemId)
+
+        if (error) {
+          itemStatusEl.className = 'error'
+          itemStatusEl.textContent = 'Errore aggiornamento piatto: ' + error.message
+          return
+        }
+
+        itemStatusEl.className = 'success'
+        itemStatusEl.textContent = 'Piatto aggiornato con successo.'
+      } else {
+        const itemsInCategory = await supabase
+          .from('menu_items')
+          .select('sort_order')
+          .eq('category_id', category_id)
+
+        const nextSortOrder = itemsInCategory.data?.length
+          ? Math.max(...itemsInCategory.data.map(i => i.sort_order || 0)) + 1
+          : 1
+
+        const { error } = await supabase
+          .from('menu_items')
+          .insert({
+            category_id,
+            name,
+            description: description || null,
+            price,
+            visible,
+            sort_order: nextSortOrder
+          })
+
+        if (error) {
+          itemStatusEl.className = 'error'
+          itemStatusEl.textContent = 'Errore salvataggio piatto: ' + error.message
+          return
+        }
+
+        itemStatusEl.className = 'success'
+        itemStatusEl.textContent = 'Piatto salvato con successo.'
+      }
+
+      await loadPublicMenu()
+      resetItemForm()
     }
 
     async function saveCategoryOrder() {
@@ -699,37 +1151,27 @@
         sortStatusEl.className = 'success'
         sortStatusEl.textContent = 'Nuovo ordine salvato con successo.'
 
-        await loadCategories()
-        await refreshSortableList()
+        await refreshStaffData()
+        await loadPublicMenu()
       } catch (error) {
         sortStatusEl.className = 'error'
         sortStatusEl.textContent = 'Errore salvataggio ordine: ' + error.message
       }
     }
 
-    async function logout() {
-      const { error } = await supabase.auth.signOut()
-
-      if (error) {
-        authStatusEl.className = 'error'
-        authStatusEl.textContent = 'Errore logout: ' + error.message
-        return
-      }
-
-      await updateAuthState()
-      authStatusEl.textContent = 'Stato login: non autenticato'
-    }
-
-    loadBtn.addEventListener('click', loadCategories)
+    loadMenuBtn.addEventListener('click', loadPublicMenu)
     loginBtn.addEventListener('click', login)
     logoutBtn.addEventListener('click', logout)
     sendRecoveryBtn.addEventListener('click', sendRecovery)
     savePasswordBtn.addEventListener('click', saveNewPassword)
     saveCategoryBtn.addEventListener('click', saveCategory)
+    saveItemBtn.addEventListener('click', saveItem)
     saveSortBtn.addEventListener('click', saveCategoryOrder)
-    reloadSortBtn.addEventListener('click', refreshSortableList)
+    reloadSortBtn.addEventListener('click', refreshStaffData)
+    cancelCategoryEditBtn.addEventListener('click', resetCategoryForm)
+    cancelItemEditBtn.addEventListener('click', resetItemForm)
 
-    loadCategories()
+    loadPublicMenu()
     updateAuthState()
   </script>
 </body>
