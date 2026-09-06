@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Menu Millennium</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -18,7 +16,7 @@
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1150px;
       margin: 0 auto;
       background: #ffffff;
       border-radius: 14px;
@@ -26,9 +24,7 @@
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     }
 
-    h1, h2, h3 {
-      margin-top: 0;
-    }
+    h1, h2, h3 { margin-top: 0; }
 
     .subtitle {
       margin-top: 0;
@@ -54,8 +50,25 @@
       background: #fafafa;
     }
 
-    .actions {
-      margin: 18px 0 16px 0;
+    input, select, button {
+      font: inherit;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      background: #fff;
+      font-size: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: bold;
     }
 
     button {
@@ -80,29 +93,20 @@
       background: #1f2937;
     }
 
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      font-size: 16px;
-      background: white;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 14px;
-      font-weight: bold;
+    .actions,
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 16px 0;
     }
 
     #status,
     #authStatus,
-    #adminStatus {
-      margin: 16px 0;
+    #adminStatus,
+    #passwordStatus,
+    #recoveryStatus {
+      margin: 14px 0;
       padding: 12px 14px;
       border-radius: 10px;
       font-size: 15px;
@@ -121,6 +125,12 @@
     #adminStatus {
       background: #fff7ed;
       border: 1px solid #fed7aa;
+    }
+
+    #passwordStatus,
+    #recoveryStatus {
+      background: #f5f3ff;
+      border: 1px solid #ddd6fe;
     }
 
     #categories {
@@ -142,7 +152,8 @@
       margin-bottom: 6px;
     }
 
-    .category-meta {
+    .category-meta,
+    .small {
       color: #666;
       font-size: 14px;
     }
@@ -167,24 +178,27 @@
       display: none;
     }
 
-    .admin-box {
+    .admin-box,
+    .password-box,
+    .recovery-box {
       margin-top: 16px;
       padding: 14px;
       border-radius: 12px;
+    }
+
+    .admin-box {
       background: #ecfeff;
       border: 1px solid #a5f3fc;
     }
 
-    .small {
-      font-size: 14px;
-      color: #666;
+    .password-box {
+      background: #eefcf2;
+      border: 1px solid #bbf7d0;
     }
 
-    .button-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
+    .recovery-box {
+      background: #faf5ff;
+      border: 1px solid #d8b4fe;
     }
 
     .divider {
@@ -197,12 +211,12 @@
 <body>
   <div class="container">
     <h1>Menu Millennium</h1>
-    <p class="subtitle">Menu pubblico + pannello staff</p>
+    <p class="subtitle">Menu pubblico + gestione staff</p>
 
     <div class="grid">
       <section class="panel">
         <h2>Menu pubblico</h2>
-        <p class="small">Questa parte è visibile a tutti i clienti che aprono il QR code.</p>
+        <p class="small">Questa parte è visibile ai clienti che aprono il QR code.</p>
 
         <div class="actions">
           <button id="loadCategoriesBtn">Carica categorie</button>
@@ -214,9 +228,41 @@
 
       <section class="panel">
         <h2>Area staff</h2>
-        <p class="small">Se sei autenticato, puoi aggiungere categorie dal sito.</p>
+        <p class="small">Login con password oppure recupero password direttamente dal sito.</p>
+
+        <label for="email">Email staff</label>
+        <input type="email" id="email" placeholder="Email staff" />
+
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Password" />
+
+        <div class="button-row">
+          <button id="loginBtn">Accedi</button>
+          <button id="logoutBtn" class="secondary-btn">Esci</button>
+        </div>
 
         <div id="authStatus">Stato login: verifica sessione...</div>
+
+        <div class="recovery-box">
+          <h3>Reset password</h3>
+          <p class="small">Se non ricordi la password, invia un link di recupero alla tua email.</p>
+          <button id="sendRecoveryBtn">Invia reset password</button>
+          <div id="recoveryStatus">Stato reset: pronto</div>
+        </div>
+
+        <div id="changePasswordBox" class="password-box hidden">
+          <h3>Imposta nuova password</h3>
+          <p class="small">Usa questo box quando sei autenticato tramite link email o login normale.</p>
+
+          <label for="newPassword">Nuova password</label>
+          <input type="password" id="newPassword" placeholder="Nuova password" />
+
+          <label for="confirmPassword">Conferma password</label>
+          <input type="password" id="confirmPassword" placeholder="Conferma password" />
+
+          <button id="savePasswordBtn">Salva nuova password</button>
+          <div id="passwordStatus">Stato password: pronto</div>
+        </div>
 
         <div id="adminBox" class="admin-box hidden">
           <h3>Nuova categoria</h3>
@@ -236,11 +282,7 @@
             <option value="false">No</option>
           </select>
 
-          <div class="button-row">
-            <button id="saveCategoryBtn">Salva categoria</button>
-            <button id="logoutBtn" class="secondary-btn">Esci</button>
-          </div>
-
+          <button id="saveCategoryBtn">Salva categoria</button>
           <div id="adminStatus">Stato admin: pronto</div>
         </div>
       </section>
@@ -252,6 +294,7 @@
 
     const SUPABASE_URL = 'https://kkdqegeqljxllrjhkfpb.supabase.co'
     const SUPABASE_KEY = 'sb_publishable_fwhO7nTMTiUJd991F1e6tw_xR99S7Ln'
+    const REDIRECT_TO = 'https://millenniumlamezia.github.io/menumillennium/#reset-password'
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
@@ -259,11 +302,23 @@
     const categoriesEl = document.getElementById('categories')
     const loadBtn = document.getElementById('loadCategoriesBtn')
 
+    const emailEl = document.getElementById('email')
+    const passwordEl = document.getElementById('password')
+    const loginBtn = document.getElementById('loginBtn')
+    const logoutBtn = document.getElementById('logoutBtn')
     const authStatusEl = document.getElementById('authStatus')
+
+    const sendRecoveryBtn = document.getElementById('sendRecoveryBtn')
+    const recoveryStatusEl = document.getElementById('recoveryStatus')
+
+    const changePasswordBoxEl = document.getElementById('changePasswordBox')
+    const newPasswordEl = document.getElementById('newPassword')
+    const confirmPasswordEl = document.getElementById('confirmPassword')
+    const savePasswordBtn = document.getElementById('savePasswordBtn')
+    const passwordStatusEl = document.getElementById('passwordStatus')
+
     const adminBoxEl = document.getElementById('adminBox')
     const adminStatusEl = document.getElementById('adminStatus')
-    const logoutBtn = document.getElementById('logoutBtn')
-
     const categoryNameEl = document.getElementById('categoryName')
     const categorySlugEl = document.getElementById('categorySlug')
     const categoryOrderEl = document.getElementById('categoryOrder')
@@ -327,11 +382,109 @@
         authStatusEl.className = 'success'
         authStatusEl.textContent = 'Stato login: autenticato come ' + session.user.email
         adminBoxEl.classList.remove('hidden')
+        changePasswordBoxEl.classList.remove('hidden')
       } else {
         authStatusEl.className = ''
         authStatusEl.textContent = 'Stato login: non autenticato'
         adminBoxEl.classList.add('hidden')
+        changePasswordBoxEl.classList.add('hidden')
       }
+    }
+
+    async function login() {
+      const email = emailEl.value.trim()
+      const password = passwordEl.value
+
+      if (!email || !password) {
+        authStatusEl.className = 'error'
+        authStatusEl.textContent = 'Inserisci email e password.'
+        return
+      }
+
+      authStatusEl.className = ''
+      authStatusEl.textContent = 'Accesso in corso...'
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (error) {
+        authStatusEl.className = 'error'
+        authStatusEl.textContent = 'Errore login: ' + error.message
+        return
+      }
+
+      passwordEl.value = ''
+      await updateAuthState()
+    }
+
+    async function sendRecovery() {
+      const email = emailEl.value.trim()
+
+      if (!email) {
+        recoveryStatusEl.className = 'error'
+        recoveryStatusEl.textContent = 'Inserisci prima l’email staff.'
+        return
+      }
+
+      recoveryStatusEl.className = ''
+      recoveryStatusEl.textContent = 'Invio email di reset in corso...'
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: REDIRECT_TO
+      })
+
+      if (error) {
+        recoveryStatusEl.className = 'error'
+        recoveryStatusEl.textContent = 'Errore reset: ' + error.message
+        return
+      }
+
+      recoveryStatusEl.className = 'success'
+      recoveryStatusEl.textContent = 'Email di reset inviata. Apri il link ricevuto e torna sul sito.'
+    }
+
+    async function saveNewPassword() {
+      const newPassword = newPasswordEl.value
+      const confirmPassword = confirmPasswordEl.value
+
+      if (!newPassword || !confirmPassword) {
+        passwordStatusEl.className = 'error'
+        passwordStatusEl.textContent = 'Compila entrambi i campi password.'
+        return
+      }
+
+      if (newPassword !== confirmPassword) {
+        passwordStatusEl.className = 'error'
+        passwordStatusEl.textContent = 'Le due password non coincidono.'
+        return
+      }
+
+      if (newPassword.length < 6) {
+        passwordStatusEl.className = 'error'
+        passwordStatusEl.textContent = 'Usa una password di almeno 6 caratteri.'
+        return
+      }
+
+      passwordStatusEl.className = ''
+      passwordStatusEl.textContent = 'Salvataggio nuova password in corso...'
+
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      })
+
+      if (error) {
+        passwordStatusEl.className = 'error'
+        passwordStatusEl.textContent = 'Errore cambio password: ' + error.message
+        return
+      }
+
+      newPasswordEl.value = ''
+      confirmPasswordEl.value = ''
+
+      passwordStatusEl.className = 'success'
+      passwordStatusEl.textContent = 'Password aggiornata con successo.'
     }
 
     async function saveCategory() {
@@ -391,13 +544,15 @@
       }
 
       await updateAuthState()
-      adminStatusEl.className = ''
-      adminStatusEl.textContent = 'Stato admin: pronto'
+      authStatusEl.textContent = 'Stato login: non autenticato'
     }
 
     loadBtn.addEventListener('click', loadCategories)
-    saveCategoryBtn.addEventListener('click', saveCategory)
+    loginBtn.addEventListener('click', login)
     logoutBtn.addEventListener('click', logout)
+    sendRecoveryBtn.addEventListener('click', sendRecovery)
+    savePasswordBtn.addEventListener('click', saveNewPassword)
+    saveCategoryBtn.addEventListener('click', saveCategory)
 
     updateAuthState()
     loadCategories()
