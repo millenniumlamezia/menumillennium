@@ -18,7 +18,7 @@
     }
 
     .container {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
       background: #ffffff;
       border-radius: 14px;
@@ -26,7 +26,7 @@
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     }
 
-    h1, h2 {
+    h1, h2, h3 {
       margin-top: 0;
     }
 
@@ -41,7 +41,7 @@
       gap: 24px;
     }
 
-    @media (min-width: 900px) {
+    @media (min-width: 950px) {
       .grid {
         grid-template-columns: 1.1fr 0.9fr;
       }
@@ -80,17 +80,28 @@
       background: #1f2937;
     }
 
-    input {
+    input,
+    select,
+    textarea {
       width: 100%;
       padding: 12px;
       margin-bottom: 12px;
       border: 1px solid #d1d5db;
       border-radius: 10px;
       font-size: 16px;
+      background: white;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: bold;
     }
 
     #status,
-    #authStatus {
+    #authStatus,
+    #adminStatus {
       margin: 16px 0;
       padding: 12px 14px;
       border-radius: 10px;
@@ -105,6 +116,11 @@
     #authStatus {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
+    }
+
+    #adminStatus {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
     }
 
     #categories {
@@ -170,17 +186,23 @@
       flex-wrap: wrap;
       margin-top: 10px;
     }
+
+    .divider {
+      height: 1px;
+      background: #e5e7eb;
+      margin: 18px 0;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Menu Millennium</h1>
-    <p class="subtitle">Menu pubblico + accesso staff</p>
+    <p class="subtitle">Menu pubblico + pannello staff</p>
 
     <div class="grid">
       <section class="panel">
         <h2>Menu pubblico</h2>
-        <p class="small">Questa parte è visibile a tutti.</p>
+        <p class="small">Questa parte è visibile a tutti i clienti che aprono il QR code.</p>
 
         <div class="actions">
           <button id="loadCategoriesBtn">Carica categorie</button>
@@ -191,22 +213,35 @@
       </section>
 
       <section class="panel">
-        <h2>Accesso staff</h2>
-        <p class="small">Accedi come utente staff.</p>
+        <h2>Area staff</h2>
+        <p class="small">Se sei autenticato, puoi aggiungere categorie dal sito.</p>
 
-        <input type="email" id="email" placeholder="Email staff" />
-        <input type="password" id="password" placeholder="Password" />
-
-        <div class="button-row">
-          <button id="loginBtn">Accedi</button>
-          <button id="logoutBtn" class="secondary-btn">Esci</button>
-        </div>
-
-        <div id="authStatus">Stato login: non autenticato</div>
+        <div id="authStatus">Stato login: verifica sessione...</div>
 
         <div id="adminBox" class="admin-box hidden">
-          <strong>Area staff attiva</strong>
-          <p class="small">Login eseguito correttamente. Nel prossimo passo useremo questa area per aggiungere e modificare categorie e prodotti.</p>
+          <h3>Nuova categoria</h3>
+
+          <label for="categoryName">Nome categoria</label>
+          <input type="text" id="categoryName" placeholder="Es. Primi piatti" />
+
+          <label for="categorySlug">Slug</label>
+          <input type="text" id="categorySlug" placeholder="Es. primi-piatti" />
+
+          <label for="categoryOrder">Ordine</label>
+          <input type="number" id="categoryOrder" placeholder="Es. 6" />
+
+          <label for="categoryVisible">Visibile</label>
+          <select id="categoryVisible">
+            <option value="true">Sì</option>
+            <option value="false">No</option>
+          </select>
+
+          <div class="button-row">
+            <button id="saveCategoryBtn">Salva categoria</button>
+            <button id="logoutBtn" class="secondary-btn">Esci</button>
+          </div>
+
+          <div id="adminStatus">Stato admin: pronto</div>
         </div>
       </section>
     </div>
@@ -224,12 +259,31 @@
     const categoriesEl = document.getElementById('categories')
     const loadBtn = document.getElementById('loadCategoriesBtn')
 
-    const emailEl = document.getElementById('email')
-    const passwordEl = document.getElementById('password')
-    const loginBtn = document.getElementById('loginBtn')
-    const logoutBtn = document.getElementById('logoutBtn')
     const authStatusEl = document.getElementById('authStatus')
     const adminBoxEl = document.getElementById('adminBox')
+    const adminStatusEl = document.getElementById('adminStatus')
+    const logoutBtn = document.getElementById('logoutBtn')
+
+    const categoryNameEl = document.getElementById('categoryName')
+    const categorySlugEl = document.getElementById('categorySlug')
+    const categoryOrderEl = document.getElementById('categoryOrder')
+    const categoryVisibleEl = document.getElementById('categoryVisible')
+    const saveCategoryBtn = document.getElementById('saveCategoryBtn')
+
+    function slugify(text) {
+      return text
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9\-]/g, '')
+        .replace(/\-+/g, '-')
+    }
+
+    categoryNameEl.addEventListener('input', () => {
+      if (!categorySlugEl.value.trim()) {
+        categorySlugEl.value = slugify(categoryNameEl.value)
+      }
+    })
 
     async function loadCategories() {
       statusEl.className = ''
@@ -280,33 +334,51 @@
       }
     }
 
-    async function login() {
-      const email = emailEl.value.trim()
-      const password = passwordEl.value
+    async function saveCategory() {
+      const name = categoryNameEl.value.trim()
+      const slug = categorySlugEl.value.trim() || slugify(name)
+      const sort_order = Number(categoryOrderEl.value || 0)
+      const visible = categoryVisibleEl.value === 'true'
 
-      if (!email || !password) {
-        authStatusEl.className = 'error'
-        authStatusEl.textContent = 'Inserisci email e password.'
+      if (!name) {
+        adminStatusEl.className = 'error'
+        adminStatusEl.textContent = 'Inserisci il nome della categoria.'
         return
       }
 
-      authStatusEl.className = ''
-      authStatusEl.textContent = 'Accesso in corso...'
+      if (!slug) {
+        adminStatusEl.className = 'error'
+        adminStatusEl.textContent = 'Inserisci uno slug valido.'
+        return
+      }
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
+      adminStatusEl.className = ''
+      adminStatusEl.textContent = 'Salvataggio categoria in corso...'
+
+      const { error } = await supabase
+        .from('categories')
+        .insert({
+          name,
+          slug,
+          sort_order,
+          visible
+        })
 
       if (error) {
-        authStatusEl.className = 'error'
-        authStatusEl.textContent = 'Errore login: ' + error.message
+        adminStatusEl.className = 'error'
+        adminStatusEl.textContent = 'Errore salvataggio: ' + error.message
         return
       }
 
-      emailEl.value = ''
-      passwordEl.value = ''
-      await updateAuthState()
+      adminStatusEl.className = 'success'
+      adminStatusEl.textContent = 'Categoria salvata con successo.'
+
+      categoryNameEl.value = ''
+      categorySlugEl.value = ''
+      categoryOrderEl.value = ''
+      categoryVisibleEl.value = 'true'
+
+      await loadCategories()
     }
 
     async function logout() {
@@ -319,13 +391,16 @@
       }
 
       await updateAuthState()
+      adminStatusEl.className = ''
+      adminStatusEl.textContent = 'Stato admin: pronto'
     }
 
     loadBtn.addEventListener('click', loadCategories)
-    loginBtn.addEventListener('click', login)
+    saveCategoryBtn.addEventListener('click', saveCategory)
     logoutBtn.addEventListener('click', logout)
 
     updateAuthState()
+    loadCategories()
   </script>
 </body>
 </html>
