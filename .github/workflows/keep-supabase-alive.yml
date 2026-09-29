@@ -1,0 +1,26 @@
+name: Keep Supabase active
+
+on:
+  schedule:
+    - cron: "15 6 * * 1,3,5"
+
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Query Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          set -e
+
+          curl --fail-with-body --silent --show-error \
+            -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}" \
+            "${SUPABASE_URL}/rest/v1/categories?select=id&limit=1"
+
+          echo "Supabase raggiunto correttamente."
